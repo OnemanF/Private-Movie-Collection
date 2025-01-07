@@ -1,7 +1,11 @@
 package dk.easv.mytunes.privatemoviecollection;
 
+import dk.easv.mytunes.privatemoviecollection.BE.CatMovie;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Movie;
+import dk.easv.mytunes.privatemoviecollection.DAO.CatMovieDAO_DB;
 import dk.easv.mytunes.privatemoviecollection.DAO.CategoryDAO_DB;
+import dk.easv.mytunes.privatemoviecollection.DAO.MovieDAO_DB;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,8 +23,17 @@ public class HelloApplication extends Application {
         stage.show();
 
         // testing
-        CategoryDAO_DB dao = new CategoryDAO_DB();
-        dao.createCategory(new Category("category test", 1));
+        CategoryDAO_DB categoryDAO = new CategoryDAO_DB();
+        CatMovieDAO_DB catMovieDAO = new CatMovieDAO_DB();
+        MovieDAO_DB movieDAO = new MovieDAO_DB();
+
+        Category category = new Category("category test", 1);
+        Category category1 = categoryDAO.createCategory(category);
+
+        Movie movie = movieDAO.createMovie(new Movie("title", 5, 2, 0));
+        CatMovie catMovie = catMovieDAO.addMovieToCategory(movie, category1);
+        System.out.println(catMovie.toString());
+        // dao.deleteCategory(new Category(4, "d",1));
     }
 
     public static void main(String[] args) {

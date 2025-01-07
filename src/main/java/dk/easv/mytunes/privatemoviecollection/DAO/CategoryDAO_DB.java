@@ -34,14 +34,19 @@ public class CategoryDAO_DB implements ICategoryDataAccess {
 
     @Override
     public void deleteCategory(Category category) throws Exception {
-        String sql_delete = "DELETE FROM Category WHERE CategoryID = ?";
+        String delete_categoriesSQL = "DELETE FROM Category WHERE CategoryID = ?";
+        String delete_connectionSQL = "DELETE FROM CatMovie WHERE CategoryID = ?";
 
         try (Connection conn = dbConnector.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement ps_delete = conn.prepareStatement(sql_delete)) {
-                // [TODO] fjerne kategori id fra alle film der indeholder denne kategori
-                ps_delete.setInt(1, category.getCategoryID());
-                ps_delete.executeUpdate();
+            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
+                PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL);
+                ps_delete_category.setInt(1, category.getCategoryID());
+                ps_delete_category.executeUpdate();
+
+                ps_delete_connection.setInt(1, category.getCategoryID());
+                ps_delete_connection.executeUpdate();
+
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();

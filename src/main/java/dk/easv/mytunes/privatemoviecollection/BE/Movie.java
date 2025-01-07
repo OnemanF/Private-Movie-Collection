@@ -8,10 +8,16 @@ public class Movie {
         private int personalRating;
         private int lastView;
 
-    public Movie(int MovieID, String title, String genre, int IMBDRating, int personalRating, int lastView) {
+    public Movie(int MovieID, String title, int IMBDRating, int personalRating, int lastView) {
         this.MovieID = MovieID;
         this.title = title;
-        this.genre = genre;
+        this.IMBDRating = IMBDRating;
+        this.personalRating = personalRating;
+        this.lastView = lastView;
+    }
+
+    public Movie(String title, int IMBDRating, int personalRating, int lastView) {
+        this.title = title;
         this.IMBDRating = IMBDRating;
         this.personalRating = personalRating;
         this.lastView = lastView;
