@@ -6,14 +6,17 @@ public class Movie {
         private String genre;
         private int IMBDRating;
         private int personalRating;
+        private int lastView;
 
-    public Movie(int MovieID, String title, String genre, int IMBDRating, int personalRating) {
+    public Movie(int MovieID, String title, String genre, int IMBDRating, int personalRating, int lastView) {
         this.MovieID = MovieID;
         this.title = title;
         this.genre = genre;
         this.IMBDRating = IMBDRating;
         this.personalRating = personalRating;
+        this.lastView = lastView;
     }
+
 
     public int getMovieID() {
         return MovieID;
@@ -53,6 +56,14 @@ public class Movie {
 
     public void setPersonalRating(int personalRating) {
         this.personalRating = personalRating;
+    }
+
+    public int getLastView() {
+        return lastView;
+    }
+
+    public void setLastView(int lastView) {
+        this.lastView = lastView;
     }
 
 
