@@ -17,6 +17,8 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
+
+        // testing
         CategoryDAO_DB dao = new CategoryDAO_DB();
         dao.createCategory(new Category("category test", 1));
     }
