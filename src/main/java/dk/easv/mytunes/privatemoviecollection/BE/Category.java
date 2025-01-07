@@ -11,6 +11,12 @@ public class Category {
         this.movies = movies;
     }
 
+    public Category(String CategoryName, int movies) {
+        this.CategoryName = CategoryName;
+        this.movies = movies;
+    }
+
+
     public int getCategoryID() {
         return CategoryID;
     }
