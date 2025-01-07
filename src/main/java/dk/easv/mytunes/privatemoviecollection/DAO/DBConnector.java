@@ -3,7 +3,6 @@ package dk.easv.mytunes.privatemoviecollection.DAO;
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import com.microsoft.sqlserver.jdbc.SQLServerException;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -15,7 +14,7 @@ public class DBConnector {
 
     public DBConnector() throws IOException {
         Properties databaseProperties = new Properties();
-        databaseProperties.load(new FileInputStream(new File(PROP_FILE)));
+        databaseProperties.load(new FileInputStream(PROP_FILE));
 
         dataSource = new SQLServerDataSource();
         dataSource.setServerName(databaseProperties.getProperty("Server"));
