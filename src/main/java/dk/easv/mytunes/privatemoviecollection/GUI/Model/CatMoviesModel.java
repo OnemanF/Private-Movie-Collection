@@ -17,6 +17,7 @@ public class CatMoviesModel {
 
     public CatMoviesModel() throws IOException {
         categories.setAll(catMovieManager.getCategories());
+
     }
 
     public ObservableList<Category> getCategories() throws IOException {

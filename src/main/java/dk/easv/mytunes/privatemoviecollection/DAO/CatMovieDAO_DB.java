@@ -49,7 +49,8 @@ public class CatMovieDAO_DB implements ICatMovieDataAccess {
             try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
                 ps_select.setInt(1, categoryId);
                 ResultSet rs = ps_select.executeQuery();
-                while (rs.next()) {
+                while (rs.next())
+                {
                     Movie movie = movieDAO.getMovieById(rs.getInt("MovieID"));
                     System.out.println(movie.toString());
                     movies.add(movie);

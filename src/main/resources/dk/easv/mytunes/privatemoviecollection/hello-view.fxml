@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="727.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.mytunes.privatemoviecollection.GUI.Controller.CatMovieController">
+<VBox alignment="CENTER" prefHeight="500.0" prefWidth="727.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.mytunes.privatemoviecollection.GUI.Controller.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -20,21 +20,21 @@
             <TableView fx:id="categoryTableView" layoutX="14.0" layoutY="67.0" prefHeight="333.0" prefWidth="200.0">
               <columns>
                 <TableColumn fx:id="categoryNameColumn" prefWidth="97.59997177124023" text="Name" />
-                <TableColumn prefWidth="101.59999084472656" text="Movies" />
+                <TableColumn fx:id="colMovies" prefWidth="101.59999084472656" text="Movies" />
               </columns>
             </TableView>
-            <TableView layoutX="224.0" layoutY="66.0" prefHeight="334.0" prefWidth="150.0">
+            <TableView fx:id="catMovieTableView" layoutX="224.0" layoutY="66.0" prefHeight="334.0" prefWidth="150.0">
               <columns>
-                <TableColumn prefWidth="64.79998779296875" text="Title" />
-                <TableColumn prefWidth="65.60003662109375" text="genre" />
+                <TableColumn fx:id="colCatMovieTitle" prefWidth="64.79998779296875" text="Title" />
+                <TableColumn fx:id="colCatMovieGenre" prefWidth="65.60003662109375" text="Genre" />
               </columns>
             </TableView>
             <TableView id="movieTableView" fx:id="movieTableView" layoutX="388.0" layoutY="67.0" prefHeight="334.0" prefWidth="285.0">
               <columns>
-                <TableColumn prefWidth="33.60003662109375" text="Title" />
-                <TableColumn prefWidth="45.60003662109375" text="Genre" />
-                  <TableColumn prefWidth="92.0" text="IMDB Rating" />
-                  <TableColumn prefWidth="112.0" text="Personal Rating" />
+                <TableColumn fx:id="colTitle" prefWidth="33.60003662109375" text="Title" />
+                <TableColumn fx:id="colGenre" prefWidth="45.60003662109375" text="Genre" />
+                  <TableColumn fx:id="colIMBDRating" prefWidth="92.0" text="IMDB Rating" />
+                  <TableColumn fx:id="colPersonalRating" prefWidth="112.0" text="Personal Rating" />
               </columns>
             </TableView>
             <Label layoutX="72.0" layoutY="27.0" prefHeight="47.0" prefWidth="83.0" text="Category">
@@ -43,7 +43,7 @@
                </font>
             </Label>
             <Label layoutX="473.0" layoutY="5.0" text="Filter:" />
-            <TextField layoutX="523.0" layoutY="1.0" />
+            <TextField fx:id="txtMovieSearch" layoutX="523.0" layoutY="1.0" />
             <Label layoutX="266.0" layoutY="27.0" prefHeight="47.0" prefWidth="117.0" text="CatMovie">
                <font>
                   <Font size="20.0" />

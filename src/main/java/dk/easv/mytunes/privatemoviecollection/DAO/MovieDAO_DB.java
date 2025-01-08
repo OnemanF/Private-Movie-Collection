@@ -17,6 +17,30 @@ public class MovieDAO_DB implements IMovieDataAccess {
         dbConnector = new DBConnector();
     }
 
+    public List<Movie> getAllMovies() throws SQLException, IOException {
+        String sql = "SELECT * FROM Movie";
+        List<Movie> movies = new ArrayList<>();
+
+        try (Connection conn = new DBConnector().getConnection();
+             PreparedStatement ps_select = conn.prepareStatement(sql);
+             ResultSet rs = ps_select.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("MovieID");
+                String title = rs.getString("title");
+                int imdbRating = rs.getInt("IMBDRating");
+                int personalRating = rs.getInt("personalRating");
+                int lastView = rs.getInt("lastView");
+
+                movies.add(new Movie(id, title, imdbRating, personalRating, lastView));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving movies", e);
+        }
+
+        return movies;
+    }
+
     @Override
     public Movie getMovieById(int ID) throws IOException {
         String sql = "SELECT * FROM Movie WHERE MovieID = ?";
