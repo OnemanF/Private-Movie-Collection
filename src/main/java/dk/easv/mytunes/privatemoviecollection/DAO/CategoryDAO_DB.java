@@ -1,15 +1,41 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryDAO_DB implements ICategoryDataAccess {
     private DBConnector dbConnector;
 
     public CategoryDAO_DB() throws IOException {
         dbConnector = new DBConnector();
+    }
+
+    @Override
+    public List<Category> getCategories() throws IOException {
+        List<Category> categories = new ArrayList<>();
+        String sql = "SELECT * FROM Category";
+        try (Connection conn = new DBConnector().getConnection()) {
+            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
+                ResultSet rs = ps_select.executeQuery();
+                while (rs.next()) {
+                    categories.add(new Category(
+                            rs.getInt("CategoryID"),
+                            rs.getString("CategoryName"),
+                            rs.getInt("movies")
+                    ));
+                }
+            }
+
+            return categories;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

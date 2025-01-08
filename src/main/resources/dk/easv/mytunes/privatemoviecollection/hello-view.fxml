@@ -10,16 +10,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="727.0" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="dk.easv.mytunes.privatemoviecollection.HelloController">
+<VBox alignment="CENTER" prefHeight="500.0" prefWidth="727.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.mytunes.privatemoviecollection.GUI.Controller.CatMovieController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
    <children>
       <AnchorPane prefHeight="644.0" prefWidth="687.0">
          <children>
-            <TableView layoutX="14.0" layoutY="67.0" prefHeight="333.0" prefWidth="200.0">
+            <TableView fx:id="categoryTableView" layoutX="14.0" layoutY="67.0" prefHeight="333.0" prefWidth="200.0">
               <columns>
-                <TableColumn prefWidth="97.59997177124023" text="Name" />
+                <TableColumn fx:id="categoryNameColumn" prefWidth="97.59997177124023" text="Name" />
                 <TableColumn prefWidth="101.59999084472656" text="Movies" />
               </columns>
             </TableView>
@@ -29,7 +29,7 @@
                 <TableColumn prefWidth="65.60003662109375" text="genre" />
               </columns>
             </TableView>
-            <TableView layoutX="388.0" layoutY="67.0" prefHeight="334.0" prefWidth="285.0">
+            <TableView id="movieTableView" fx:id="movieTableView" layoutX="388.0" layoutY="67.0" prefHeight="334.0" prefWidth="285.0">
               <columns>
                 <TableColumn prefWidth="33.60003662109375" text="Title" />
                 <TableColumn prefWidth="45.60003662109375" text="Genre" />

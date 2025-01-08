@@ -23,6 +23,7 @@ public class HelloApplication extends Application {
         stage.show();
 
         // testing
+        /*
         CategoryDAO_DB categoryDAO = new CategoryDAO_DB();
         CatMovieDAO_DB catMovieDAO = new CatMovieDAO_DB();
         MovieDAO_DB movieDAO = new MovieDAO_DB();
@@ -34,6 +35,8 @@ public class HelloApplication extends Application {
         CatMovie catMovie = catMovieDAO.addMovieToCategory(movie, category1);
         System.out.println(catMovie.toString());
         // dao.deleteCategory(new Category(4, "d",1));
+
+         */
     }
 
     public static void main(String[] args) {

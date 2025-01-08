@@ -7,5 +7,8 @@ module dk.easv.mytunes.privatemoviecollection {
 
 
     opens dk.easv.mytunes.privatemoviecollection to javafx.fxml;
+    opens dk.easv.mytunes.privatemoviecollection.GUI.Controller to javafx.fxml;
+    opens dk.easv.mytunes.privatemoviecollection.BE to javafx.base;
     exports dk.easv.mytunes.privatemoviecollection;
+    exports dk.easv.mytunes.privatemoviecollection.GUI.Controller to javafx.fxml;
 }

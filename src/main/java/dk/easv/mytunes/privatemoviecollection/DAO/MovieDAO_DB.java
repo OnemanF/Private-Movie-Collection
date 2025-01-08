@@ -1,14 +1,14 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.CatMovie;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieDAO_DB implements IMovieDataAccess {
     private DBConnector dbConnector;
@@ -16,6 +16,25 @@ public class MovieDAO_DB implements IMovieDataAccess {
     public MovieDAO_DB() throws IOException {
         dbConnector = new DBConnector();
     }
+
+    @Override
+    public Movie getMovieById(int ID) throws IOException {
+        String sql = "SELECT * FROM Movie WHERE MovieID = ?";
+        try (Connection conn = new DBConnector().getConnection()) {
+            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
+                ps_select.setInt(1, ID);
+                ResultSet rs = ps_select.executeQuery();
+                if (rs.next()) {
+                    return new Movie(ID, rs.getString("title"), rs.getInt("IMBDRating"), rs.getInt("personalRating"), rs.getInt("lastView"));
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public Movie createMovie(Movie movie) throws Exception {
@@ -39,7 +58,25 @@ public class MovieDAO_DB implements IMovieDataAccess {
     }
 
     @Override
-    public void deleteMovie(Movie movie) {
+    public void deleteMovie(Movie movie) throws Exception {
+        String delete_categoriesSQL = "DELETE FROM Movie WHERE MovieID = ?";
+        String delete_connectionSQL = "DELETE FROM CatMovie WHERE MovieID = ?";
 
+        try (Connection conn = dbConnector.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
+                PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL);
+                ps_delete_category.setInt(1, movie.getMovieID());
+                ps_delete_category.executeUpdate();
+
+                ps_delete_connection.setInt(1, movie.getMovieID());
+                ps_delete_connection.executeUpdate();
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new Exception("Unable to delete the movie " + movie.getTitle().trim(), e);
+            }
+        }
     }
 }

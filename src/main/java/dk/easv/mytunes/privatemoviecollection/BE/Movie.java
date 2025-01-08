@@ -72,6 +72,10 @@ public class Movie {
         this.lastView = lastView;
     }
 
+    @Override
+    public String toString() {
+        return this.getTitle() + " " + this.getIMBDRating() + " " + this.getPersonalRating() + " " + this.getLastView();
+    }
 
 
 }
