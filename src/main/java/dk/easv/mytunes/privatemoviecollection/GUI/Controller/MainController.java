@@ -28,7 +28,7 @@ public class MainController implements Initializable {
     @FXML
     private TableView<Movie> catMovieTableView;
 
-    //coloumns Category, Movie & Catmovie
+    //coloumns Category, Movie
     @FXML
     private TableColumn<Category, String> categoryNameColumn, colMovies;
 
@@ -36,14 +36,9 @@ public class MainController implements Initializable {
     private TableColumn<Movie, String> colTitle, colGenre, colIMBDRating, colPersonalRating;
 
     @FXML
-    private TableColumn<Movie, String> colCatMovieTitle, colCatMovieGenre;
-
-    @FXML
     private TextField txtMovieSearch;
 
-    private String folder = "movies\\";
-
-    private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
+    private final ObservableList<Movie> MovieList = FXCollections.observableArrayList();
 
     private CategoryModel categoryModel;
 
@@ -92,12 +87,6 @@ public class MainController implements Initializable {
 
     private void SetupTableViews(){
 
-        colCatMovieTitle.setCellValueFactory(new PropertyValueFactory<>("Title"));
-        colCatMovieGenre.setCellValueFactory(new PropertyValueFactory<>("Genre"));
-
-        // Binding songs to catMovieTableView
-        catMovieTableView.setItems(CatMovieList);
-
         //SongTableView
         colTitle.setCellValueFactory(new PropertyValueFactory<>("Title"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("Genre"));
@@ -117,7 +106,7 @@ public class MainController implements Initializable {
         categoryTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
+                    MovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
                 } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
