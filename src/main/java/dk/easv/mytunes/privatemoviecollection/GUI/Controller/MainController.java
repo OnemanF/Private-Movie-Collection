@@ -8,10 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
@@ -28,7 +25,10 @@ public class MainController implements Initializable {
     @FXML
     private TableView<Movie> catMovieTableView;
 
-    //coloumns Category, Movie
+    @FXML
+    private ListView<Category> categoryListView;
+
+    //coloumns Category, Movie & Catmovie
     @FXML
     private TableColumn<Category, String> categoryNameColumn, colMovies;
 
@@ -36,9 +36,14 @@ public class MainController implements Initializable {
     private TableColumn<Movie, String> colTitle, colGenre, colIMBDRating, colPersonalRating;
 
     @FXML
+    private TableColumn<Movie, String> colCatMovieTitle, colCatMovieGenre;
+
+    @FXML
     private TextField txtMovieSearch;
 
-    private final ObservableList<Movie> MovieList = FXCollections.observableArrayList();
+    private String folder = "movies\\";
+
+    private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
 
     private CategoryModel categoryModel;
 
@@ -95,18 +100,19 @@ public class MainController implements Initializable {
 
         movieTableView.setItems(movieModel.getMovies());
 
-        //CategoryTableView
-        colMovies.setCellValueFactory(new PropertyValueFactory<>("Movies"));
-        categoryNameColumn.setCellValueFactory(new PropertyValueFactory<>("CategoryName"));
         try {
-            categoryTableView.setItems(categoryModel.getCategories());
+            categoryListView.setItems(categoryModel.getCategories());
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
-        categoryTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+
+        // Event listener for selecting a category in the ListView
+        categoryListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    MovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
+                    // Fetch movies for the selected category
+                    CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
+                    movieTableView.setItems(CatMovieList);
                 } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -123,6 +129,8 @@ public class MainController implements Initializable {
             }
         });
     }
+
+
 
 
     }

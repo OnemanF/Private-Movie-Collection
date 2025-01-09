@@ -40,4 +40,9 @@ public class Category {
     public void setMovies(int movies) {
         this.movies = movies;
     }
+
+    @Override
+    public String toString() {
+        return CategoryName;
+    }
 }
