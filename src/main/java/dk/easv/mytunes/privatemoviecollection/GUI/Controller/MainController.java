@@ -2,6 +2,7 @@ package dk.easv.mytunes.privatemoviecollection.GUI.Controller;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
+import dk.easv.mytunes.privatemoviecollection.DAO.TrailerDAO_DB;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
@@ -11,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -111,8 +113,41 @@ public class MainController implements Initializable {
         });
     }
 
-
-
-
+    public void initializeDatabase() {
+        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
+        trailerDAO.createTrailerTable(); // Opret tabellen
     }
+
+    public static void importTrailers() {
+        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
+
+        // Sti til din movies-mappe
+        File folder = new File("src/movies");
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile() && file.getName().endsWith(".mp4")) {
+                    String name = file.getName(); // Filnavnet
+                    String path = file.getAbsolutePath(); // Stien til filen
+
+                    // Indsæt data i databasen
+                    trailerDAO.addTrailer(name, path);
+                }
+            }
+        }
+    }
+    public static void main(String[] args) {
+        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
+
+        // Opret trailertabel, hvis den ikke findes
+        trailerDAO.createTrailerTable();
+
+        // Importér trailers fra mappen
+        importTrailers();
+    }
+
+
+
+}
 
