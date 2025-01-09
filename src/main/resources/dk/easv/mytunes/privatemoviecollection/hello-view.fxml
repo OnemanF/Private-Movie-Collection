@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -58,6 +59,7 @@
             <Button layoutX="72.0" layoutY="412.0" mnemonicParsing="false" text="Remove" />
             <Button layoutX="482.0" layoutY="412.0" mnemonicParsing="false" text="Add" />
             <Button layoutX="531.0" layoutY="412.0" mnemonicParsing="false" text="Remove" />
+            <ComboBox fx:id="categoryComboBox" layoutX="14.0" layoutY="10.0" prefWidth="150.0" />
          </children>
       </AnchorPane>
    </children>

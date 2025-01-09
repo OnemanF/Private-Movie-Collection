@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -50,6 +51,11 @@ public class MainController implements Initializable {
 
     private MovieModel movieModel;
 
+    @FXML
+    private ComboBox<String> categoryComboBox;
+
+    private ObservableList<String> categories;
+
 
     public MainController() throws IOException {
         catMoviesModel = new CatMoviesModel();
@@ -65,7 +71,25 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
 
+        categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror");
 
+        // Bind the categories to the ComboBox
+        categoryComboBox.setItems(categories);
+
+        // Set up a listener for selection
+        categoryComboBox.setOnAction(event -> {
+            String selectedCategory = categoryComboBox.getSelectionModel().getSelectedItem();
+            System.out.println("Selected Category: " + selectedCategory);
+
+            // Handle filtering or logic based on selected category
+            filterMoviesByCategory(selectedCategory);
+        });
+
+    }
+
+    private void filterMoviesByCategory(String category) {
+        // Placeholder logic for filtering movies
+        System.out.println("Filtering movies by category: " + category);
     }
 
     private void SetupTableViews(){
