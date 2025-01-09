@@ -7,11 +7,19 @@ import java.util.List;
 
 public class Search {
 
+
     public List<Movie> search(List<Movie> searchBase, String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return searchBase;
+        }
+
         List<Movie> searchResult = new ArrayList<>();
 
         for (Movie movie : searchBase) {
-            if (compareToMovieTitle(query, movie) || compareToMovieGenre(query, movie) || compareToMovieIMBDRating(query, movie) || compareToMoviePersonalRating(query, movie)) {
+            if (compareToMovieTitle(query, movie) ||
+                    compareToMovieGenre(query, movie) ||
+                    compareToMovieIMBDRating(query, movie) ||
+                    compareToMoviePersonalRating(query, movie)) {
                 searchResult.add(movie);
             }
         }

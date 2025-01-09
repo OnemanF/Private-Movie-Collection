@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -41,18 +42,29 @@ public class MainController implements Initializable {
     @FXML
     private TextField txtMovieSearch;
 
+    private String folder = "movies\\";
 
     private final ObservableList<CatMovie> CatMovieList = FXCollections.observableArrayList();
 
     private CatMoviesModel catMoviesModel;
 
+    private MovieModel movieModel;
+
+
     public MainController() throws IOException {
         catMoviesModel = new CatMoviesModel();
+
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        SetupTableViews();
+        try {
+            movieModel = new MovieModel();
+            SetupTableViews();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -69,6 +81,8 @@ public class MainController implements Initializable {
         colGenre.setCellValueFactory(new PropertyValueFactory<>("Genre"));
         colIMBDRating.setCellValueFactory(new PropertyValueFactory<>("IMBDRating"));
         colPersonalRating.setCellValueFactory(new PropertyValueFactory<>("PersonalRating"));
+
+        movieTableView.setItems(movieModel.getMovies());
 
         //CategoryTableView
         colMovies.setCellValueFactory(new PropertyValueFactory<>("Movies"));
@@ -88,13 +102,11 @@ public class MainController implements Initializable {
             }
         });
 
-        //binding Movies to movie table
-        movieTableView.setItems(MovieModel.getMovies());
-
 
         txtMovieSearch.textProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
-                MovieModel.SearchMovie(newValue);
+                movieModel.searchMovies(newValue); // Use instance method
+                movieTableView.refresh(); // Refresh the table to show filtered results
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -102,7 +114,5 @@ public class MainController implements Initializable {
     }
 
 
+    }
 
-
-
-}
