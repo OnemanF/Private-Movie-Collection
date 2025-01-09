@@ -10,4 +10,6 @@ public interface ICategoryDataAccess {
     void deleteCategory(Category category) throws Exception;
 
     List<Category> getCategories() throws IOException;
+
+    Category getCategoryById(int categoryId);
 }

@@ -74,7 +74,7 @@ public class Movie {
 
     @Override
     public String toString() {
-        return this.getTitle() + " " + this.getIMBDRating() + " " + this.getPersonalRating() + " " + this.getLastView();
+        return this.getTitle() + " " + this.getGenre() + " " + this.getIMBDRating() + " " + this.getPersonalRating() + " " + this.getLastView();
     }
 
 

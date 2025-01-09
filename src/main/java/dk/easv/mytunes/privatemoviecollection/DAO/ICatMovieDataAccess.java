@@ -12,5 +12,7 @@ import java.util.List;
 public interface ICatMovieDataAccess {
     public CatMovie addMovieToCategory(Movie movie, Category category) throws Exception;
 
+    List<String> getCategoriesByMovie(int categoryId) throws IOException, SQLException;
+
     List<Movie> getMoviesByCategory(int categoryId) throws IOException, SQLException;
 }

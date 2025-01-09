@@ -42,6 +42,28 @@ public class CatMovieDAO_DB implements ICatMovieDataAccess {
     }
 
     @Override
+    public List<String> getCategoriesByMovie(int movieId) throws IOException, SQLException {
+        List<String> categories = new ArrayList<>();
+        String sql = "SELECT * FROM CatMovie WHERE MovieID = ?";
+        try (Connection conn = new DBConnector().getConnection()) {
+            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
+                ps_select.setInt(1, movieId);
+                ResultSet rs = ps_select.executeQuery();
+                while (rs.next())
+                {
+                    Category categori = categoryDAO.getCategoryById(rs.getInt("CategoryID"));
+                    if (categori != null) {
+                        System.out.println("Category ID: " + categori.getCategoryID());
+                        categories.add(categori.getCategoryName());
+                    }
+                }
+            }
+
+            return categories;
+        }
+    }
+
+    @Override
     public List<Movie> getMoviesByCategory(int categoryId) throws IOException, SQLException {
         List<Movie> movies = new ArrayList<>();
         String sql = "SELECT * FROM CatMovie WHERE CategoryID = ?";
