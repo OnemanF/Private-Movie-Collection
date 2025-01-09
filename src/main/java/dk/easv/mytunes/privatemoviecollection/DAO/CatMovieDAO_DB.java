@@ -1,6 +1,5 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.CatMovie;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
@@ -9,15 +8,16 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CatMovieDAO_DB implements ICatMovieDataAccess {
     private DBConnector dbConnector;
     private MovieDAO_DB movieDAO;
+    private CategoryDAO_DB categoryDAO;
 
     public CatMovieDAO_DB() throws IOException {
         dbConnector = new DBConnector();
         movieDAO = new MovieDAO_DB();
+        categoryDAO = new CategoryDAO_DB();
     }
 
     @Override

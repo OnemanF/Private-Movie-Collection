@@ -1,8 +1,7 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
-import dk.easv.mytunes.privatemoviecollection.BE.Movie;
+import dk.easv.mytunes.privatemoviecollection.BLL.CategoryManager;
 
 import java.io.IOException;
 import java.sql.*;
@@ -11,7 +10,6 @@ import java.util.List;
 
 public class CategoryDAO_DB implements ICategoryDataAccess {
     private DBConnector dbConnector;
-
     public CategoryDAO_DB() throws IOException {
         dbConnector = new DBConnector();
     }

@@ -1,9 +1,8 @@
 package dk.easv.mytunes.privatemoviecollection.GUI.Controller;
 
-import dk.easv.mytunes.privatemoviecollection.BE.CatMovie;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
-import dk.easv.mytunes.privatemoviecollection.GUI.Model.CatMoviesModel;
+import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,7 +14,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -47,7 +45,7 @@ public class MainController implements Initializable {
 
     private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
 
-    private CatMoviesModel catMoviesModel;
+    private CategoryModel categoryModel;
 
     private MovieModel movieModel;
 
@@ -58,7 +56,7 @@ public class MainController implements Initializable {
 
 
     public MainController() throws IOException {
-        catMoviesModel = new CatMoviesModel();
+        categoryModel = new CategoryModel();
 
     }
 
@@ -112,14 +110,14 @@ public class MainController implements Initializable {
         colMovies.setCellValueFactory(new PropertyValueFactory<>("Movies"));
         categoryNameColumn.setCellValueFactory(new PropertyValueFactory<>("CategoryName"));
         try {
-            categoryTableView.setItems(catMoviesModel.getCategories());
-        } catch (IOException e) {
+            categoryTableView.setItems(categoryModel.getCategories());
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
         categoryTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    CatMovieList.setAll(catMoviesModel.getMoviesByCategory(newValue.getCategoryID()));
+                    CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
                 } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
