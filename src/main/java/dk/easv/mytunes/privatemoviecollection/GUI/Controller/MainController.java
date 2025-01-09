@@ -41,18 +41,11 @@ public class MainController implements Initializable {
     @FXML
     private TextField txtMovieSearch;
 
-    private String folder = "movies\\";
-
     private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
 
     private CategoryModel categoryModel;
 
     private MovieModel movieModel;
-
-    @FXML
-    private ComboBox<String> categoryComboBox;
-
-    private ObservableList<String> categories;
 
 
     public MainController() throws IOException {
@@ -68,26 +61,6 @@ public class MainController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror");
-
-        // Bind the categories to the ComboBox
-        categoryComboBox.setItems(categories);
-
-        // Set up a listener for selection
-        categoryComboBox.setOnAction(event -> {
-            String selectedCategory = categoryComboBox.getSelectionModel().getSelectedItem();
-            System.out.println("Selected Category: " + selectedCategory);
-
-            // Handle filtering or logic based on selected category
-            filterMoviesByCategory(selectedCategory);
-        });
-
-    }
-
-    private void filterMoviesByCategory(String category) {
-        // Placeholder logic for filtering movies
-        System.out.println("Filtering movies by category: " + category);
     }
 
     private void SetupTableViews(){
