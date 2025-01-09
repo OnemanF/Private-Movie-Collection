@@ -26,7 +26,7 @@ public class MainController implements Initializable {
     @FXML
     private TableView<Category> categoryTableView;
     @FXML
-    private TableView<CatMovie> catMovieTableView;
+    private TableView<Movie> catMovieTableView;
 
     //coloumns Category, Movie & Catmovie
     @FXML
@@ -42,7 +42,7 @@ public class MainController implements Initializable {
     private TextField txtMovieSearch;
 
 
-    private final ObservableList<CatMovie> CatMovieList = FXCollections.observableArrayList();
+    private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
 
     private CatMoviesModel catMoviesModel;
 
@@ -81,7 +81,7 @@ public class MainController implements Initializable {
         categoryTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    catMoviesModel.showMovies(newValue.getCategoryID());
+                    CatMovieList.setAll(catMoviesModel.getMoviesByCategory(newValue.getCategoryID()));
                 } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
