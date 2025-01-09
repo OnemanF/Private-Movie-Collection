@@ -53,7 +53,6 @@ public class CatMovieDAO_DB implements ICatMovieDataAccess {
                 {
                     Category categori = categoryDAO.getCategoryById(rs.getInt("CategoryID"));
                     if (categori != null) {
-                        System.out.println("Category ID: " + categori.getCategoryID());
                         categories.add(categori.getCategoryName());
                     }
                 }
@@ -74,7 +73,6 @@ public class CatMovieDAO_DB implements ICatMovieDataAccess {
                 while (rs.next())
                 {
                     Movie movie = movieDAO.getMovieById(rs.getInt("MovieID"));
-                    System.out.println(movie.toString());
                     movies.add(movie);
                 }
             }

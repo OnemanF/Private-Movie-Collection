@@ -3,7 +3,7 @@ package dk.easv.mytunes.privatemoviecollection.BLL;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.DAO.CatMovieDAO_DB;
 import dk.easv.mytunes.privatemoviecollection.DAO.MovieDAO_DB;
-import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
+import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,12 +13,13 @@ public class MovieManager {
     private final MovieDAO_DB movieDB;
     private final CatMovieDAO_DB catMovieDB;
     private final Search movieSearch;
+    private final MovieModel movieModel;
 
-
-    public MovieManager() throws IOException {
+    public MovieManager(MovieModel movieModel) throws IOException {
         this.movieDB = new MovieDAO_DB();
         this.catMovieDB = new CatMovieDAO_DB();
         this.movieSearch = new Search();
+        this.movieModel = movieModel;
     }
 
 
@@ -26,7 +27,6 @@ public class MovieManager {
         List<Movie> movies = movieDB.getAllMovies();
         for (Movie movie : movies) {
             movie.setGenre(updateGenre(movie));
-            System.out.println(movie);
         }
 
         return movies;
@@ -34,12 +34,11 @@ public class MovieManager {
 
     public String updateGenre(Movie movie) throws SQLException, IOException {
         List<String> genreNames = catMovieDB.getCategoriesByMovie(movie.getMovieID());
-        System.out.println(genreNames.toString());
         return String.join(",", genreNames);
     }
 
     public List<Movie> searchMovies(String query) throws Exception {
-        List<Movie> allMovies = getAllMovies(); // Fetch all movies from DB
+        List<Movie> allMovies = movieModel.getAllMovies();
         return movieSearch.search(allMovies, query); // Search for matching movies
     }
 }

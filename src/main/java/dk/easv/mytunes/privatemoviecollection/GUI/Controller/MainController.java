@@ -41,17 +41,13 @@ public class MainController implements Initializable {
     @FXML
     private TextField txtMovieSearch;
 
-    private String folder = "movies\\";
-
-    private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
-
-    private CategoryModel categoryModel;
-
-    private MovieModel movieModel;
-
     @FXML
     private ComboBox<String> categoryComboBox;
 
+    private String folder = "movies\\";
+    private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
+    private final CategoryModel categoryModel;
+    private MovieModel movieModel;
     private ObservableList<String> categories;
 
 
@@ -69,6 +65,7 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
 
+        // TODO Hent fra database
         categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror");
 
         // Bind the categories to the ComboBox

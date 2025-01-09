@@ -10,10 +10,13 @@ import java.util.List;
 public class MovieModel {
     private final ObservableList<Movie> moviesList;
     private final MovieManager movieManager;
+    private final ObservableList<Movie> allMovies = FXCollections.observableArrayList();
+
 
     public MovieModel() throws Exception {
-        this.movieManager = new MovieManager();
+        this.movieManager = new MovieManager(this);
         this.moviesList = FXCollections.observableArrayList();
+        allMovies.setAll(movieManager.getAllMovies());
         refreshMoviesList();
     }
 
@@ -25,6 +28,7 @@ public class MovieModel {
     public ObservableList<Movie> getMovies() {
         return moviesList;
     }
+    public ObservableList<Movie> getAllMovies() { return allMovies; }
 
     public void searchMovies(String query) throws Exception {
         List<Movie> searchResult = movieManager.searchMovies(query); // Use instance method
