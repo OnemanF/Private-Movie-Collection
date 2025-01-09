@@ -8,23 +8,27 @@ import javafx.collections.ObservableList;
 import java.util.List;
 
 public class MovieModel {
-        private static ObservableList<Movie> moviesList;
-        private MovieManager movieManager;
+    private final ObservableList<Movie> moviesList;
+    private final MovieManager movieManager;
 
-    public MovieModel() throws Exception  {
-        movieManager = new MovieManager();
-        moviesList = FXCollections.observableArrayList();
-        moviesList.addAll(MovieManager.getAllMovies());
+    public MovieModel() throws Exception {
+        this.movieManager = new MovieManager();
+        this.moviesList = FXCollections.observableArrayList();
+        refreshMoviesList();
     }
 
-        public static ObservableList<Movie> getMovies() {
+    private void refreshMoviesList() throws Exception {
+        moviesList.clear();
+        moviesList.addAll(movieManager.getAllMovies());
+    }
+
+    public ObservableList<Movie> getMovies() {
         return moviesList;
     }
 
-        public static void SearchMovie(String query) throws Exception {
-            List<Movie> searchResult = MovieManager.MovieSearch(query);
-            moviesList.clear();
-            moviesList.addAll(searchResult);
-        }
-
+    public void searchMovies(String query) throws Exception {
+        List<Movie> searchResult = movieManager.searchMovies(query); // Use instance method
+        moviesList.clear();
+        moviesList.addAll(searchResult);
     }
+}

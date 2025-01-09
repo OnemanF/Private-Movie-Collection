@@ -8,22 +8,23 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class MovieManager {
-        private static MovieDAO_DB movieDB;
-        private static Search MovieSearch = new Search();
+    private final MovieDAO_DB movieDB;
+    private final Search movieSearch;
+
 
     public MovieManager() throws IOException {
-        movieDB = new MovieDAO_DB();
-        MovieSearch = new Search();
+        this.movieDB = new MovieDAO_DB(); // Initialize database access object
+        this.movieSearch = new Search(); // Initialize search helper
     }
 
-    public static List<Movie> getAllMovies() throws SQLException, IOException{
+
+    public List<Movie> getAllMovies() throws SQLException, IOException {
         return movieDB.getAllMovies();
     }
 
-    public static List<Movie> MovieSearch(String query) throws Exception {
-        List<Movie> allSongs = getAllMovies();
-        List<Movie> searchResult = MovieSearch.search(allSongs, query);
-        return searchResult;
 
+    public List<Movie> searchMovies(String query) throws Exception {
+        List<Movie> allMovies = getAllMovies(); // Fetch all movies from DB
+        return movieSearch.search(allMovies, query); // Search for matching movies
     }
 }
