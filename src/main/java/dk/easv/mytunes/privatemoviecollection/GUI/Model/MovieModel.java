@@ -35,4 +35,14 @@ public class MovieModel {
         moviesList.clear();
         moviesList.addAll(searchResult);
     }
+
+    public void addMovie(Movie movie) throws Exception {
+        try {
+            Movie createdMovie = movieManager.addMovie(movie);
+            allMovies.add(createdMovie);
+            refreshMoviesList();
+        } catch (Exception e) {
+            throw new Exception("Failed to add movie: " + e.getMessage(), e);
+        }
+    }
 }

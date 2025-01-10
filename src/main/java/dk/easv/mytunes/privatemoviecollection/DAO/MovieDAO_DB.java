@@ -62,14 +62,14 @@ public class MovieDAO_DB implements IMovieDataAccess {
 
     @Override
     public Movie createMovie(Movie movie) throws Exception {
-        String sql_insert = "INSERT INTO Movie (title, IMBDRating, personalRating) VALUES (?, ?, ?)";
+        String sql_insert = "INSERT INTO Movie (title, IMBDRating, personalRating, lastview) VALUES (?, ?, ?, ?)";
 
         try(Connection conn = dbConnector.getConnection(); PreparedStatement ps_insert = conn.prepareStatement(sql_insert, Statement.RETURN_GENERATED_KEYS)){
             ps_insert.setString(1, movie.getTitle());
             ps_insert.setInt(2, movie.getIMBDRating());
             ps_insert.setInt(3, movie.getPersonalRating());
+            ps_insert.setInt(4, movie.getLastView());
             ps_insert.executeUpdate();
-
             ResultSet rs = ps_insert.getGeneratedKeys();
             rs.next();
             int ID = rs.getInt(1);

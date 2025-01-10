@@ -39,6 +39,14 @@ public class MovieManager {
 
     public List<Movie> searchMovies(String query) throws Exception {
         List<Movie> allMovies = movieModel.getAllMovies();
-        return movieSearch.search(allMovies, query); // Search for matching movies
+        return movieSearch.search(allMovies, query);
+    }
+
+    public Movie addMovie(Movie movie) throws Exception {
+        try {
+            return movieDB.createMovie(movie);
+        } catch (Exception e) {
+            throw new Exception("Error adding movie to the database: " + e.getMessage(), e);
+        }
     }
 }

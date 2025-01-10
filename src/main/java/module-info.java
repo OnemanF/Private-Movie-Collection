@@ -4,6 +4,7 @@ module dk.easv.mytunes.privatemoviecollection {
     requires java.sql;
     requires com.microsoft.sqlserver.jdbc;
     requires java.naming;
+    requires java.desktop;
 
 
     opens dk.easv.mytunes.privatemoviecollection to javafx.fxml;

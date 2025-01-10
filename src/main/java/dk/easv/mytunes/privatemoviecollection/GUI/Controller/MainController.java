@@ -11,11 +11,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -30,6 +33,9 @@ public class MainController implements Initializable {
     @FXML
     private ListView<Category> categoryListView;
 
+    @FXML
+    private Button addMovieButton;
+
     //coloumns Category, Movie & Catmovie
     @FXML
     private TableColumn<Category, String> categoryNameColumn, colMovies;
@@ -42,6 +48,11 @@ public class MainController implements Initializable {
 
     @FXML
     private TextField txtMovieSearch;
+
+    @FXML
+    private void AddMovie() {
+        showAddMovieDialog();
+    }
 
     private String folder = "movies\\";
     private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
@@ -60,6 +71,7 @@ public class MainController implements Initializable {
         try {
             movieModel = new MovieModel();
             SetupTableViews();
+            addMovieButton.setOnAction(event -> showAddMovieDialog());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,7 +159,96 @@ public class MainController implements Initializable {
         importTrailers();
     }
 
+    private void showAddMovieDialog() {
+        Dialog<Movie> dialog = new Dialog<>();
+        dialog.setTitle("Add Movie");
+
+        TextField titleField = new TextField();
+        titleField.setPromptText("Movie Title");
+
+        TextField imdbRatingField = new TextField();
+        imdbRatingField.setPromptText("IMDB Rating");
+
+        TextField personalRatingField = new TextField();
+        personalRatingField.setPromptText("Personal Rating");
+
+        ComboBox<Category> categoryDropdown = new ComboBox<>();
+        try {
+            categoryDropdown.setItems(categoryModel.getCategories());
+            categoryDropdown.setPromptText("Select Category");
+        } catch (Exception e) {
+            System.out.println("Error loading categories: " + e.getMessage());
+            return;
+        }
 
 
-}
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(new Label("Title:"), 0, 0);
+        grid.add(titleField, 1, 0);
+        grid.add(new Label("IMDB Rating:"), 0, 1);
+        grid.add(imdbRatingField, 1, 1);
+        grid.add(new Label("Personal Rating:"), 0, 2);
+        grid.add(personalRatingField, 1, 2);
+        grid.add(new Label("Category:"), 0, 3);
+        grid.add(categoryDropdown, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+
+        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButton) {
+                try {
+                    String title = titleField.getText().trim();
+                    int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
+                    int personalRating = Integer.parseInt(personalRatingField.getText().trim());
+                    Category selectedCategory = categoryDropdown.getValue();
+
+
+                    if (title.isEmpty()) {
+                        throw new IllegalArgumentException("Title cannot be empty.");
+                    }
+                    if (selectedCategory == null) {
+                        throw new IllegalArgumentException("You must select a category.");
+                    }
+
+
+                    int categoryID = selectedCategory.getCategoryID();
+
+
+                    return new Movie(title, imdbRating, personalRating, categoryID);
+                } catch (NumberFormatException e) {
+                    System.out.println("IMDB and Personal Rating must be valid numbers.");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Validation Error: " + e.getMessage());
+                } catch (Exception e) {
+                    System.out.println("Unexpected Error: " + e.getMessage());
+                }
+            }
+            return null;
+        });
+
+
+        Optional<Movie> result = dialog.showAndWait();
+        result.ifPresent(movie -> {
+            try {
+                movieModel.addMovie(movie);
+                movieTableView.refresh();
+                System.out.println("Movie added successfully: " + movie);
+            } catch (Exception e) {
+                System.out.println("Failed to add movie: " + e.getMessage());
+            }
+        });
+    }
+
+
+    }
+
+
+
+
 

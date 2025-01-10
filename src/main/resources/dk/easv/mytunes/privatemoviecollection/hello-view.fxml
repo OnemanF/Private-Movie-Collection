@@ -48,7 +48,7 @@
                 <ListView fx:id="categoryListView" layoutX="550.0" layoutY="80.0" prefHeight="250.0" prefWidth="200.0" />
 
                 <!-- Buttons -->
-                <Button fx:id="btnAddMovie" layoutX="20.0" layoutY="430.0" mnemonicParsing="false" text="Add Movie" />
+                <Button fx:id="addMovieButton" layoutX="20.0" layoutY="430.0" mnemonicParsing="false" onAction="#AddMovie" text="Add Movie" />
                 <Button fx:id="btnRemoveMovie" layoutX="120.0" layoutY="430.0" mnemonicParsing="false" text="Remove Movie" />
                 <Button fx:id="btnAddCategory" layoutX="550.0" layoutY="340.0" mnemonicParsing="false" text="Add Category" />
                 <Button fx:id="btnRemoveCategory" layoutX="650.0" layoutY="340.0" mnemonicParsing="false" text="Remove Category" />
