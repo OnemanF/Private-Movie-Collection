@@ -39,10 +39,24 @@ public class MovieModel {
     public void addMovie(Movie movie) throws Exception {
         try {
             Movie createdMovie = movieManager.addMovie(movie);
+            createdMovie.setGenre(movieManager.updateGenre(createdMovie));
+            moviesList.add(createdMovie);
             allMovies.add(createdMovie);
-            refreshMoviesList();
         } catch (Exception e) {
             throw new Exception("Failed to add movie: " + e.getMessage(), e);
         }
     }
+
+    public void removeMovie(Movie movie) throws Exception {
+        try {
+            movieManager.removeMovie(movie);
+
+
+            moviesList.remove(movie);
+            allMovies.remove(movie);
+        } catch (Exception e) {
+            throw new Exception("Failed to remove movie: " + e.getMessage(), e);
+        }
+    }
+
 }

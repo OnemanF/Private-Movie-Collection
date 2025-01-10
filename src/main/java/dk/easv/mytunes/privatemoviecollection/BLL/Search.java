@@ -27,8 +27,12 @@ public class Search {
         return searchResult;
     }
 
-    private boolean compareToMovieGenre(String query, Movie movie) {
-        return movie.getGenre().toLowerCase().contains(query.toLowerCase());
+    public boolean compareToMovieGenre(String query, Movie movie) {
+        String genre = movie.getGenre();
+        if (genre == null) {
+            return false;
+        }
+        return genre.toLowerCase().contains(query.toLowerCase());
     }
 
     private boolean compareToMovieTitle(String query, Movie movie) {
@@ -37,7 +41,7 @@ public class Search {
 
     private boolean compareToMovieIMBDRating(String query, Movie movie) {
         try {
-            int queryRating = Integer.parseInt(query); // Convert query to integer
+            int queryRating = Integer.parseInt(query);
             return movie.getIMBDRating() == queryRating;
         } catch (NumberFormatException e) {
             return false;
@@ -46,7 +50,7 @@ public class Search {
 
     private boolean compareToMoviePersonalRating(String query, Movie movie) {
         try {
-            int queryRating = Integer.parseInt(query); // Convert query to integer
+            int queryRating = Integer.parseInt(query);
             return movie.getPersonalRating() == queryRating;
         } catch (NumberFormatException e) {
             return false;

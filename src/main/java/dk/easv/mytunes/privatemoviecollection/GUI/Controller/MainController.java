@@ -7,13 +7,13 @@ import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -63,7 +63,6 @@ public class MainController implements Initializable {
 
     public MainController() throws IOException {
         categoryModel = new CategoryModel();
-
     }
 
     @Override
@@ -72,6 +71,8 @@ public class MainController implements Initializable {
             movieModel = new MovieModel();
             SetupTableViews();
             addMovieButton.setOnAction(event -> showAddMovieDialog());
+
+            movieTableView.setItems(movieModel.getMovies());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,7 +88,6 @@ public class MainController implements Initializable {
 
     private void SetupTableViews(){
 
-        //SongTableView
         colTitle.setCellValueFactory(new PropertyValueFactory<>("Title"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("Genre"));
         colIMBDRating.setCellValueFactory(new PropertyValueFactory<>("IMBDRating"));
@@ -101,7 +101,7 @@ public class MainController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        // Event listener for selecting a category in the ListView
+
         categoryListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
@@ -117,8 +117,8 @@ public class MainController implements Initializable {
 
         txtMovieSearch.textProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
-                movieModel.searchMovies(newValue); // Use instance method
-                movieTableView.refresh(); // Refresh the table to show filtered results
+                movieModel.searchMovies(newValue);
+                movieTableView.refresh();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -246,7 +246,28 @@ public class MainController implements Initializable {
     }
 
 
+    @FXML
+    private void RemoveMovie(ActionEvent actionEvent) {
+        Movie selectedMovie = movieTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedMovie != null) {
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Are you sure you want to remove this movie?\nMovie: " + selectedMovie.getTitle(),
+                    ButtonType.OK, ButtonType.CANCEL);
+
+            Optional<ButtonType> result = confirmation.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    movieModel.removeMovie(selectedMovie);
+                } catch (Exception e) {
+                    System.err.println("Error removing movie: " + e.getMessage());
+                }
+            }
+        }
     }
+
+
+}
 
 
 

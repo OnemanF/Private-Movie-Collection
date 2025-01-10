@@ -49,4 +49,9 @@ public class MovieManager {
             throw new Exception("Error adding movie to the database: " + e.getMessage(), e);
         }
     }
+
+    public void removeMovie(Movie movie) throws Exception {
+        movieDB.deleteMovie(movie);
+    }
+
 }
