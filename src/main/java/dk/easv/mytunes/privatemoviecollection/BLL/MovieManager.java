@@ -1,5 +1,6 @@
 package dk.easv.mytunes.privatemoviecollection.BLL;
 
+import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.DAO.CatMovieDAO_DB;
 import dk.easv.mytunes.privatemoviecollection.DAO.MovieDAO_DB;
@@ -26,15 +27,10 @@ public class MovieManager {
     public List<Movie> getAllMovies() throws SQLException, IOException {
         List<Movie> movies = movieDB.getAllMovies();
         for (Movie movie : movies) {
-            movie.setGenre(updateGenre(movie));
+            //movie.setGenre(getGenre(movie));
         }
 
         return movies;
-    }
-
-    public String updateGenre(Movie movie) throws SQLException, IOException {
-        List<String> genreNames = catMovieDB.getCategoriesByMovie(movie.getMovieID());
-        return String.join(",", genreNames);
     }
 
     public List<Movie> searchMovies(String query) throws Exception {
@@ -42,9 +38,13 @@ public class MovieManager {
         return movieSearch.search(allMovies, query);
     }
 
-    public Movie addMovie(Movie movie) throws Exception {
+    public Movie addMovie(Movie movie, List<Category> categories) throws Exception {
         try {
-            return movieDB.createMovie(movie);
+            Movie movieToReturn = movieDB.createMovie(movie, categories);
+            for (Category category : categories) {
+                catMovieDB.addMovieToCategory(movieToReturn, category);
+            }
+            return movieToReturn;
         } catch (Exception e) {
             throw new Exception("Error adding movie to the database: " + e.getMessage(), e);
         }

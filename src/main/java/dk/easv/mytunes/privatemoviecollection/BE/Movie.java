@@ -23,6 +23,15 @@ public class Movie {
         this.lastView = lastView;
     }
 
+    public Movie(int MovieID, String title, int IMBDRating, int personalRating, int lastView, String genre) {
+        this.MovieID = MovieID;
+        this.title = title;
+        this.genre = genre;
+        this.IMBDRating = IMBDRating;
+        this.personalRating = personalRating;
+        this.lastView = lastView;
+    }
+
 
     public int getMovieID() {
         return MovieID;

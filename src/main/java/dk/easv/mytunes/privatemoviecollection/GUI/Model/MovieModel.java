@@ -1,5 +1,6 @@
 package dk.easv.mytunes.privatemoviecollection.GUI.Model;
 
+import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.BLL.MovieManager;
 import javafx.collections.FXCollections;
@@ -36,12 +37,13 @@ public class MovieModel {
         moviesList.addAll(searchResult);
     }
 
-    public void addMovie(Movie movie) throws Exception {
+    public Movie addMovie(Movie movie, List<Category> categories) throws Exception {
         try {
-            Movie createdMovie = movieManager.addMovie(movie);
-            createdMovie.setGenre(movieManager.updateGenre(createdMovie));
+            Movie createdMovie = movieManager.addMovie(movie, categories);
+            System.out.println(createdMovie);
             moviesList.add(createdMovie);
             allMovies.add(createdMovie);
+            return createdMovie;
         } catch (Exception e) {
             throw new Exception("Failed to add movie: " + e.getMessage(), e);
         }

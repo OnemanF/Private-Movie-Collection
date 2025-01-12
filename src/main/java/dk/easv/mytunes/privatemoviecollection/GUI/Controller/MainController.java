@@ -18,8 +18,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainController implements Initializable {
     //Tableviews
@@ -199,7 +202,7 @@ public class MainController implements Initializable {
 
         ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
-
+        List<Category> categorys = new ArrayList<>();
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
                 try {
@@ -217,10 +220,10 @@ public class MainController implements Initializable {
                     }
 
 
-                    int categoryID = selectedCategory.getCategoryID();
+                    categorys.add(selectedCategory);
 
 
-                    return new Movie(title, imdbRating, personalRating, categoryID);
+                    return new Movie(title, imdbRating, personalRating, 0);
                 } catch (NumberFormatException e) {
                     System.out.println("IMDB and Personal Rating must be valid numbers.");
                 } catch (IllegalArgumentException e) {
@@ -236,9 +239,9 @@ public class MainController implements Initializable {
         Optional<Movie> result = dialog.showAndWait();
         result.ifPresent(movie -> {
             try {
-                movieModel.addMovie(movie);
+                Movie createdMovie = movieModel.addMovie(movie, categorys);
                 movieTableView.refresh();
-                System.out.println("Movie added successfully: " + movie);
+                System.out.println("Movie added successfully: " + createdMovie);
             } catch (Exception e) {
                 System.out.println("Failed to add movie: " + e.getMessage());
             }
