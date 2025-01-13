@@ -50,8 +50,8 @@
                 <!-- Buttons -->
                 <Button fx:id="addMovieButton" layoutX="20.0" layoutY="430.0" mnemonicParsing="false" onAction="#AddMovie" text="Add Movie" />
                 <Button fx:id="btnRemoveMovie" layoutX="120.0" layoutY="430.0" mnemonicParsing="false" onAction="#RemoveMovie" text="Remove Movie" />
-                <Button fx:id="btnAddCategory" layoutX="550.0" layoutY="340.0" mnemonicParsing="false" text="Add Category" />
-                <Button fx:id="btnRemoveCategory" layoutX="650.0" layoutY="340.0" mnemonicParsing="false" text="Remove Category" />
+                <Button fx:id="btnAddCategory" layoutX="550.0" layoutY="340.0" mnemonicParsing="false" onAction="#AddCategory" text="Add Category" />
+                <Button fx:id="btnRemoveCategory" layoutX="650.0" layoutY="340.0" mnemonicParsing="false" onAction="#RemoveCategory" text="Remove Category" />
             </children>
         </AnchorPane>
     </children>

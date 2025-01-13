@@ -75,6 +75,17 @@ public class CategoryDAO_DB implements ICategoryDataAccess {
         }
     }
 
+    public void addCategory(String categoryName) throws SQLException {
+        String sql = "INSERT INTO Category (CategoryName) VALUES (?)";
+
+        try (Connection connection = DBConnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, categoryName);
+            preparedStatement.executeUpdate();
+        }
+
+}
+
     @Override
     public void deleteCategory(Category category) throws Exception {
         String delete_categoriesSQL = "DELETE FROM Category WHERE CategoryID = ?";
@@ -82,21 +93,26 @@ public class CategoryDAO_DB implements ICategoryDataAccess {
 
         try (Connection conn = dbConnector.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
-                PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL);
-                ps_delete_category.setInt(1, category.getCategoryID());
-                ps_delete_category.executeUpdate();
-
+            try (
+                    PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL);
+                    PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)
+            ) {
                 ps_delete_connection.setInt(1, category.getCategoryID());
                 ps_delete_connection.executeUpdate();
+
+
+                ps_delete_category.setInt(1, category.getCategoryID());
+                ps_delete_category.executeUpdate();
 
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
-                throw new Exception("Unable to delete the category " + category.getCategoryName().trim(), e);
+                throw new Exception("Unable to delete the category " + category.getCategoryName().trim() + ". Transaction rolled back.", e);
             }
         }
     }
+
+
 
 
 }
