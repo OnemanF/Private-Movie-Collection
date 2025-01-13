@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
@@ -19,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Modality;
 
 import java.awt.*;
 import java.io.File;
@@ -299,7 +301,55 @@ public class MainController implements Initializable {
             }
         }
     }
+    @FXML
+    private void AddCategory(ActionEvent actionevent){
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add Category");
+        dialog.setHeaderText("Enter a new category name:");
+        dialog.setContentText("Category:");
 
+        // Show the dialog and get user input
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(categoryName -> {
+            if (!categoryName.trim().isEmpty()) {
+                try {
+                    CategoryModel categoryModel = new CategoryModel();
+                    categoryModel.addCategory(categoryName.trim());
+
+                    // Refresh the ListView
+                    categoryListView.setItems(categoryModel.getCategories());
+                } catch (Exception e) {
+                    e.printStackTrace(); // Replace with proper error handling/logging
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void RemoveCategory (ActionEvent actionEvent) {
+        Category selectedCategory = categoryListView.getSelectionModel().getSelectedItem();
+
+        if (selectedCategory != null) {
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Remove Category");
+            confirmationAlert.setHeaderText("Are you sure you want to delete this category?");
+            confirmationAlert.setContentText(selectedCategory.getCategoryName());
+
+            Optional<ButtonType> result = confirmationAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+
+                    CategoryModel categoryModel = new CategoryModel();
+                    categoryModel.removeCategory(selectedCategory);
+
+
+                    categoryListView.setItems(categoryModel.getCategories());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+    }
+    }
 
 }
 
