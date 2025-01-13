@@ -12,7 +12,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +45,12 @@ public class MainController implements Initializable {
     @FXML
     private TableColumn<Category, String> categoryNameColumn, colMovies;
 
+
     @FXML
-    private TableColumn<Movie, String> colTitle, colGenre, colIMBDRating, colPersonalRating;
+    private TableColumn<Movie, Integer> colPersonalRating;
+
+    @FXML
+    private TableColumn<Movie, String> colTitle, colGenre, colIMBDRating;
 
     @FXML
     private TableColumn<Movie, String> colCatMovieTitle, colCatMovieGenre;
@@ -81,7 +87,7 @@ public class MainController implements Initializable {
         }
 
         // TODO Hent fra database
-        categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror");
+        categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror,", "Sci-Fi");
     }
 
     private void filterMoviesByCategory(String category) {
@@ -124,9 +130,33 @@ public class MainController implements Initializable {
                 movieTableView.refresh();
             } catch (Exception e) {
                 e.printStackTrace();
+
+
+
+                // Make "Personal Rating" editable and validate it to be between 0 and 10
+                movieTableView.setEditable(true);
+                colPersonalRating.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+                colPersonalRating.setOnEditCommit(event -> {
+                    Movie movie = event.getRowValue();
+                    int newRating = event.getNewValue();
+
+                    // Validate personal rating between 0 and 10
+                    if (newRating >= 0 && newRating <= 10) {
+                        movie.setPersonalRating(newRating);  // Update rating if valid
+                    } else {
+                        // Show error if rating is not between 0 and 10
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Invalid Rating");
+                        alert.setHeaderText("Rating must be between 0 and 10.");
+                        alert.showAndWait();
+                    }
+                });
+
             }
         });
     }
+
+
 
     public void initializeDatabase() {
         TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
