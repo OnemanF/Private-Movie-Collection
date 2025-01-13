@@ -91,18 +91,25 @@ public class MovieDAO_DB implements IMovieDataAccess {
 
         try (Connection conn = dbConnector.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
-                PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL);
-                ps_delete_category.setInt(1, movie.getMovieID());
-                ps_delete_category.executeUpdate();
-
+            try (PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL)) {
                 ps_delete_connection.setInt(1, movie.getMovieID());
                 ps_delete_connection.executeUpdate();
-
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
-                throw new Exception("Unable to delete the movie " + movie.getTitle().trim(), e);
+                System.out.println(e);
+                throw new Exception("Unable to delete the movie from CatMovie " + movie.getTitle().trim(), e);
+            }
+
+
+            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
+                ps_delete_category.setInt(1, movie.getMovieID());
+                ps_delete_category.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println(e);
+                throw new Exception("Unable to delete the movie from Movie " + movie.getTitle().trim(), e);
             }
         }
     }
