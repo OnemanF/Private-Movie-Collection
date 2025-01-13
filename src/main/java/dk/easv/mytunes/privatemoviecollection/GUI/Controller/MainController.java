@@ -11,9 +11,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -104,6 +111,15 @@ public class MainController implements Initializable {
             throw new RuntimeException(e);
         }
 
+        movieTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+           if (newValue != null) {
+               try {
+                   playMovie(newValue);
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+           }
+        });
 
         categoryListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -133,6 +149,11 @@ public class MainController implements Initializable {
         List<Movie> movies = movieModel.searchMovies(newValue, selectedCategory);
         movieTableView.setItems((ObservableList<Movie>) movies);
         movieTableView.refresh();
+    }
+
+    public void playMovie(Movie movie) throws IOException {
+        File file = new File("src/main/java/dk/easv/mytunes/privatemoviecollection/movies/" + movie.getTitle() + ".mp4");
+        Desktop.getDesktop().open(file);
     }
 
     public void initializeDatabase() {
