@@ -62,7 +62,7 @@ public class MainController implements Initializable {
     private final CategoryModel categoryModel;
     private MovieModel movieModel;
     private ObservableList<String> categories;
-
+    private Category selectedCategory = null;
 
     public MainController() throws IOException {
         categoryModel = new CategoryModel();
@@ -111,6 +111,7 @@ public class MainController implements Initializable {
                     // Fetch movies for the selected category
                     CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
                     movieTableView.setItems(CatMovieList);
+                    selectedCategory = newValue;
                 } catch (SQLException | IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -120,7 +121,8 @@ public class MainController implements Initializable {
 
         txtMovieSearch.textProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
-                movieModel.searchMovies(newValue);
+                List<Movie> movies = movieModel.searchMovies(newValue, selectedCategory);
+                movieTableView.setItems((ObservableList<Movie>) movies);
                 movieTableView.refresh();
             } catch (Exception e) {
                 e.printStackTrace();

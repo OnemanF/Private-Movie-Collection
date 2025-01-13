@@ -6,6 +6,7 @@ import dk.easv.mytunes.privatemoviecollection.BLL.MovieManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovieModel {
@@ -31,10 +32,22 @@ public class MovieModel {
     }
     public ObservableList<Movie> getAllMovies() { return allMovies; }
 
-    public void searchMovies(String query) throws Exception {
+    public List<Movie> searchMovies(String query, Category selectedCategory) throws Exception {
         List<Movie> searchResult = movieManager.searchMovies(query); // Use instance method
         moviesList.clear();
         moviesList.addAll(searchResult);
+
+        List<Movie> moviesToRemove = new ArrayList<>();
+        if (selectedCategory != null && !moviesList.isEmpty()) {
+            for (Movie movie : moviesList) {
+                if (!movie.getGenre().contains(selectedCategory.getCategoryName())) {
+                    moviesToRemove.add(movie);
+                }
+            }
+        }
+        moviesList.removeAll(moviesToRemove);
+
+        return moviesList;
     }
 
     public Movie addMovie(Movie movie, List<Category> categories) throws Exception {
