@@ -8,6 +8,7 @@ import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -117,6 +119,9 @@ public class MainController implements Initializable {
            if (newValue != null) {
                try {
                    playMovie(newValue);
+                   javafx.application.Platform.runLater(() -> {
+                       movieTableView.getSelectionModel().clearSelection();
+                   });
                } catch (Exception e) {
                    e.printStackTrace();
                }
