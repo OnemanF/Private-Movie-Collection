@@ -65,8 +65,6 @@ public class MovieModel {
     public void removeMovie(Movie movie) throws Exception {
         try {
             movieManager.removeMovie(movie);
-
-
             moviesList.remove(movie);
             allMovies.remove(movie);
         } catch (Exception e) {

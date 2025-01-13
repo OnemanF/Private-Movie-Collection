@@ -112,7 +112,8 @@ public class MainController implements Initializable {
                     CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
                     movieTableView.setItems(CatMovieList);
                     selectedCategory = newValue;
-                } catch (SQLException | IOException e) {
+                    searchMovie(txtMovieSearch.getText());
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -121,13 +122,17 @@ public class MainController implements Initializable {
 
         txtMovieSearch.textProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
-                List<Movie> movies = movieModel.searchMovies(newValue, selectedCategory);
-                movieTableView.setItems((ObservableList<Movie>) movies);
-                movieTableView.refresh();
+               searchMovie(newValue);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    public void searchMovie(String newValue) throws Exception {
+        List<Movie> movies = movieModel.searchMovies(newValue, selectedCategory);
+        movieTableView.setItems((ObservableList<Movie>) movies);
+        movieTableView.refresh();
     }
 
     public void initializeDatabase() {
@@ -244,6 +249,7 @@ public class MainController implements Initializable {
                 Movie createdMovie = movieModel.addMovie(movie, categorys);
                 movieTableView.refresh();
                 System.out.println("Movie added successfully: " + createdMovie);
+                searchMovie(txtMovieSearch.getText());
             } catch (Exception e) {
                 System.out.println("Failed to add movie: " + e.getMessage());
             }
@@ -264,6 +270,8 @@ public class MainController implements Initializable {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 try {
                     movieModel.removeMovie(selectedMovie);
+                    movieTableView.refresh();
+                    searchMovie(txtMovieSearch.getText());
                 } catch (Exception e) {
                     System.err.println("Error removing movie: " + e.getMessage());
                 }
