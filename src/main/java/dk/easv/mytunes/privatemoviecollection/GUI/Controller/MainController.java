@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
 import java.awt.*;
@@ -219,6 +220,17 @@ public class MainController implements Initializable {
             return;
         }
 
+        TextField fileField = new TextField();
+        fileField.setEditable(false);
+        Button browseButton = new Button("Browse...");
+        FileChooser fileChooser = new FileChooser();
+        browseButton.setOnAction(e -> {
+            File selectedFile = fileChooser.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
+            if (selectedFile != null) {
+                fileField.setText(selectedFile.getAbsolutePath());
+            }
+        });
+
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -231,12 +243,17 @@ public class MainController implements Initializable {
         grid.add(personalRatingField, 1, 2);
         grid.add(new Label("Category:"), 0, 3);
         grid.add(categoryDropdown, 1, 3);
+        grid.add(new Label("File:"), 0, 4);
+        grid.add(fileField, 1, 4);
+        grid.add(browseButton, 2, 4);
+
 
         dialog.getDialogPane().setContent(grid);
 
 
         ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+
         List<Category> categorys = new ArrayList<>();
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
@@ -245,6 +262,7 @@ public class MainController implements Initializable {
                     int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
                     int personalRating = Integer.parseInt(personalRatingField.getText().trim());
                     Category selectedCategory = categoryDropdown.getValue();
+                    String filePath = fileField.getText().trim();
 
 
                     if (title.isEmpty()) {
@@ -252,6 +270,9 @@ public class MainController implements Initializable {
                     }
                     if (selectedCategory == null) {
                         throw new IllegalArgumentException("You must select a category.");
+                    }
+                    if (filePath.isEmpty()) {
+                        throw new IllegalArgumentException("You must select a file.");
                     }
 
 
