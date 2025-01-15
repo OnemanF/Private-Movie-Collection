@@ -6,9 +6,10 @@ public class Movie {
         private String genre;
         private int IMBDRating;
         private int personalRating;
-        private int lastView;
+        private String lastView;
+        private String filePath;
 
-    public Movie(int MovieID, String title, int IMBDRating, int personalRating, int lastView) {
+    public Movie(int MovieID, String title, int IMBDRating, int personalRating, String lastView) {
         this.MovieID = MovieID;
         this.title = title;
         this.IMBDRating = IMBDRating;
@@ -16,20 +17,30 @@ public class Movie {
         this.lastView = lastView;
     }
 
-    public Movie(String title, int IMBDRating, int personalRating, int lastView) {
+    public Movie(String title, int IMBDRating, int personalRating, String lastView) {
         this.title = title;
         this.IMBDRating = IMBDRating;
         this.personalRating = personalRating;
         this.lastView = lastView;
     }
 
-    public Movie(int MovieID, String title, int IMBDRating, int personalRating, int lastView, String genre) {
+    public Movie(int MovieID, String title, int IMBDRating, int personalRating, String lastView, String genre, String filePath) {
         this.MovieID = MovieID;
         this.title = title;
         this.genre = genre;
         this.IMBDRating = IMBDRating;
         this.personalRating = personalRating;
         this.lastView = lastView;
+        this.filePath = filePath;
+    }
+
+    public Movie(String title, String genre, int IMBDRating, int personalRating, String lastView, String filePath) {
+        this.title = title;
+        this.genre = genre;
+        this.IMBDRating = IMBDRating;
+        this.personalRating = personalRating;
+        this.lastView = lastView;
+        this.filePath = filePath;
     }
 
 
@@ -37,16 +48,8 @@ public class Movie {
         return MovieID;
     }
 
-    public void setMovieID(int movieID) {
-        MovieID = movieID;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getGenre() {
@@ -61,24 +64,16 @@ public class Movie {
         return IMBDRating;
     }
 
-    public void setIMBDRating(int IMBDRating) {
-        this.IMBDRating = IMBDRating;
-    }
-
     public int getPersonalRating() {
         return personalRating;
     }
 
-    public void setPersonalRating(int personalRating) {
-        this.personalRating = personalRating;
-    }
-
-    public int getLastView() {
+    public String getLastView() {
         return lastView;
     }
 
-    public void setLastView(int lastView) {
-        this.lastView = lastView;
+    public String getFilePath() {
+        return filePath;
     }
 
     @Override

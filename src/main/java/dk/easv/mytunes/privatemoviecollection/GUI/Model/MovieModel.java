@@ -58,7 +58,9 @@ public class MovieModel {
             allMovies.add(createdMovie);
             return createdMovie;
         } catch (Exception e) {
-            throw new Exception("Failed to add movie: " + e.getMessage(), e);
+            String errorMessage = "Failed to add movie: " + movie.getTitle() + ". Error: " + e.getMessage();
+            System.err.println(errorMessage);
+            throw new Exception(errorMessage, e);
         }
     }
 

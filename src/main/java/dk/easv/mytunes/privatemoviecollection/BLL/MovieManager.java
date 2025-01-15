@@ -27,7 +27,6 @@ public class MovieManager {
     public List<Movie> getAllMovies() throws SQLException, IOException {
         List<Movie> movies = movieDB.getAllMovies();
         for (Movie movie : movies) {
-            //movie.setGenre(getGenre(movie));
         }
 
         return movies;

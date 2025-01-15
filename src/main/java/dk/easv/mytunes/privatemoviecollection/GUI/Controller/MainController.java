@@ -2,48 +2,33 @@ package dk.easv.mytunes.privatemoviecollection.GUI.Controller;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
-import dk.easv.mytunes.privatemoviecollection.DAO.TrailerDAO_DB;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class MainController implements Initializable {
-    //Tableviews
     @FXML
     private TableView<Movie> movieTableView;
-    @FXML
-    private TableView<Category> categoryTableView;
-    @FXML
-    private TableView<Movie> catMovieTableView;
 
     @FXML
     private ListView<Category> categoryListView;
@@ -51,15 +36,8 @@ public class MainController implements Initializable {
     @FXML
     private Button addMovieButton;
 
-    //coloumns Category, Movie & Catmovie
-    @FXML
-    private TableColumn<Category, String> categoryNameColumn, colMovies;
-
     @FXML
     private TableColumn<Movie, String> colTitle, colGenre, colIMBDRating, colPersonalRating;
-
-    @FXML
-    private TableColumn<Movie, String> colCatMovieTitle, colCatMovieGenre;
 
     @FXML
     private TextField txtMovieSearch;
@@ -69,7 +47,6 @@ public class MainController implements Initializable {
         showAddMovieDialog();
     }
 
-    private String folder = "movies\\";
     private final ObservableList<Movie> CatMovieList = FXCollections.observableArrayList();
     private final CategoryModel categoryModel;
     private MovieModel movieModel;
@@ -86,19 +63,10 @@ public class MainController implements Initializable {
             movieModel = new MovieModel();
             SetupTableViews();
             addMovieButton.setOnAction(event -> showAddMovieDialog());
-
             movieTableView.setItems(movieModel.getMovies());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // TODO Hent fra database
-        categories = FXCollections.observableArrayList("Action", "Comedy", "Drama", "Horror");
-    }
-
-    private void filterMoviesByCategory(String category) {
-        // Placeholder logic for filtering movies
-        System.out.println("Filtering movies by category: " + category);
     }
 
     private void SetupTableViews(){
@@ -116,23 +84,9 @@ public class MainController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        movieTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-           if (newValue != null) {
-               try {
-                   playMovie(newValue);
-                   javafx.application.Platform.runLater(() -> {
-                       movieTableView.getSelectionModel().clearSelection();
-                   });
-               } catch (Exception e) {
-                   e.printStackTrace();
-               }
-           }
-        });
-
         categoryListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    // Fetch movies for the selected category
                     CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
                     movieTableView.setItems(CatMovieList);
                     selectedCategory = newValue;
@@ -143,12 +97,30 @@ public class MainController implements Initializable {
             }
         });
 
-
         txtMovieSearch.textProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
                searchMovie(newValue);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        });
+
+        movieTableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Movie selectedMovie = movieTableView.getSelectionModel().getSelectedItem();
+                if (selectedMovie != null) {
+                    try {
+                        playMovie(selectedMovie);
+                    } catch (IOException e) {
+                        System.err.println("Error playing movie: " + e.getMessage());
+                    }
+                }
+            }
+        });
+
+        movieTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                System.out.println("Selected Movie: " + newValue);
             }
         });
     }
@@ -160,42 +132,20 @@ public class MainController implements Initializable {
     }
 
     public void playMovie(Movie movie) throws IOException {
-        File file = new File("src/main/java/dk/easv/mytunes/privatemoviecollection/movies/" + movie.getTitle() + ".mp4");
-        Desktop.getDesktop().open(file);
-    }
-
-    public void initializeDatabase() {
-        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
-        trailerDAO.createTrailerTable(); // Opret tabellen
-    }
-
-    public static void importTrailers() {
-        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
-
-        // Sti til din movies-mappe
-        File folder = new File("src/movies");
-        File[] files = folder.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".mp4")) {
-                    String name = file.getName(); // Filnavnet
-                    String path = file.getAbsolutePath(); // Stien til filen
-
-                    // Indsæt data i databasen
-                    trailerDAO.addTrailer(name, path);
-                }
-            }
+        if (movie == null) {
+            System.err.println("Error: Attempted to play a null movie.");
+            return;
         }
-    }
-    public static void main(String[] args) {
-        TrailerDAO_DB trailerDAO = new TrailerDAO_DB();
+        String moviePath = movie.getFilePath();
+        File file = new File(moviePath);
 
-        // Opret trailertabel, hvis den ikke findes
-        trailerDAO.createTrailerTable();
-
-        // Importér trailers fra mappen
-        importTrailers();
+        if (!file.exists()) {
+            System.err.println("Error: The file " + moviePath + " doesn't exist.");
+            Alert alert = new Alert(Alert.AlertType.ERROR, "The file doesn't exist: " + moviePath, ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        Desktop.getDesktop().open(file);
     }
 
     private void showAddMovieDialog() {
@@ -210,6 +160,9 @@ public class MainController implements Initializable {
 
         TextField personalRatingField = new TextField();
         personalRatingField.setPromptText("Personal Rating");
+
+        TextField genreField = new TextField();
+        genreField.setPromptText("Genre");
 
         ComboBox<Category> categoryDropdown = new ComboBox<>();
         try {
@@ -227,7 +180,9 @@ public class MainController implements Initializable {
         browseButton.setOnAction(e -> {
             File selectedFile = fileChooser.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
             if (selectedFile != null) {
-                fileField.setText(selectedFile.getAbsolutePath());
+                String absolutePath = selectedFile.getAbsolutePath();
+                String relativePath = absolutePath.replace(System.getProperty("user.dir") + "\\", "");
+                fileField.setText(relativePath);
             }
         });
 
@@ -247,63 +202,85 @@ public class MainController implements Initializable {
         grid.add(fileField, 1, 4);
         grid.add(browseButton, 2, 4);
 
-
         dialog.getDialogPane().setContent(grid);
-
 
         ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
 
-        List<Category> categorys = new ArrayList<>();
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
-                try {
-                    String title = titleField.getText().trim();
-                    int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
-                    int personalRating = Integer.parseInt(personalRatingField.getText().trim());
-                    Category selectedCategory = categoryDropdown.getValue();
-                    String filePath = fileField.getText().trim();
-
-
-                    if (title.isEmpty()) {
-                        throw new IllegalArgumentException("Title cannot be empty.");
-                    }
-                    if (selectedCategory == null) {
-                        throw new IllegalArgumentException("You must select a category.");
-                    }
-                    if (filePath.isEmpty()) {
-                        throw new IllegalArgumentException("You must select a file.");
-                    }
-
-
-                    categorys.add(selectedCategory);
-
-
-                    return new Movie(title, imdbRating, personalRating, 0);
-                } catch (NumberFormatException e) {
-                    System.out.println("IMDB and Personal Rating must be valid numbers.");
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Validation Error: " + e.getMessage());
-                } catch (Exception e) {
-                    System.out.println("Unexpected Error: " + e.getMessage());
+                Movie movie = handleDialogResult(titleField, imdbRatingField, personalRatingField, genreField, categoryDropdown, fileField);
+                if (movie == null) {
+                    return null;
                 }
+                return movie;
             }
             return null;
         });
 
-
         Optional<Movie> result = dialog.showAndWait();
-        result.ifPresent(movie -> {
-            try {
-                Movie createdMovie = movieModel.addMovie(movie, categorys);
-                movieTableView.refresh();
-                System.out.println("Movie added successfully: " + createdMovie);
-                searchMovie(txtMovieSearch.getText());
-            } catch (Exception e) {
-                System.out.println("Failed to add movie: " + e.getMessage());
-            }
-        });
+        result.ifPresent(movie -> handleMovieAddition(movie, categoryDropdown.getValue()));
     }
+
+    private Movie handleDialogResult(TextField titleField, TextField imdbRatingField, TextField personalRatingField, TextField genreField, ComboBox<Category> categoryDropdown, TextField fileField) {
+        try {
+            String title = titleField.getText().trim();
+            int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
+            int personalRating = Integer.parseInt(personalRatingField.getText().trim());
+            String genre = genreField.getText().trim();
+            Category selectedCategory = categoryDropdown.getValue();
+            String lastViewed = java.time.LocalDate.now().toString();
+            String filePath = fileField.getText().trim();
+
+            validateInputs(title, imdbRating, personalRating, genre, selectedCategory, filePath);
+
+            Movie movie = new Movie(title, genre, imdbRating, personalRating, lastViewed, filePath);
+            return movie;
+
+        } catch (NumberFormatException e) {
+            displayError("IMDB and Personal Rating must be valid numbers.");
+        } catch (IllegalArgumentException e) {
+            displayError("Validation Error: " + e.getMessage());
+        } catch (Exception e) {
+            displayError("Unexpected Error: " + e.getMessage());
+        }
+        return null;
+    }
+
+
+    private void handleMovieAddition(Movie movie, Category category) {
+        if (movie == null) {
+            return;
+        }
+
+        try {
+            movieModel.addMovie(movie, Collections.singletonList(category));
+            movieTableView.refresh();
+            System.out.println("Movie added successfully: " + movie);
+            searchMovie(txtMovieSearch.getText());
+        } catch (Exception e) {
+            String errorMessage = "Failed to add movie: " + e.getMessage();
+            displayError(errorMessage);
+        }
+    }
+
+    private void validateInputs(String title, int imdbRating, int personalRating, String genre, Category selectedCategory, String filePath) {
+        if (title.isEmpty()) throw new IllegalArgumentException("Title cannot be empty.");
+        if (genre.isEmpty()) throw new IllegalArgumentException("Genre cannot be empty.");
+        if (selectedCategory == null) throw new IllegalArgumentException("You must select a category.");
+        if (filePath.isEmpty()) throw new IllegalArgumentException("You must select a file.");
+        if (imdbRating < 0 || imdbRating > 10) throw new IllegalArgumentException("IMDB Rating must be between 0 and 10.");
+        if (personalRating < 0 || personalRating > 10) throw new IllegalArgumentException("Personal Rating must be between 0 and 10.");
+    }
+
+    private void displayError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Validation Error");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
 
     @FXML
@@ -323,6 +300,8 @@ public class MainController implements Initializable {
                     searchMovie(txtMovieSearch.getText());
                 } catch (Exception e) {
                     System.err.println("Error removing movie: " + e.getMessage());
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while removing the movie.", ButtonType.OK);
+                    errorAlert.showAndWait();
                 }
             }
         }
@@ -334,18 +313,15 @@ public class MainController implements Initializable {
         dialog.setHeaderText("Enter a new category name:");
         dialog.setContentText("Category:");
 
-        // Show the dialog and get user input
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(categoryName -> {
             if (!categoryName.trim().isEmpty()) {
                 try {
                     CategoryModel categoryModel = new CategoryModel();
                     categoryModel.addCategory(categoryName.trim());
-
-                    // Refresh the ListView
                     categoryListView.setItems(categoryModel.getCategories());
                 } catch (Exception e) {
-                    e.printStackTrace(); // Replace with proper error handling/logging
+                    e.printStackTrace();
                 }
             }
         });
@@ -378,8 +354,3 @@ public class MainController implements Initializable {
     }
 
 }
-
-
-
-
-
