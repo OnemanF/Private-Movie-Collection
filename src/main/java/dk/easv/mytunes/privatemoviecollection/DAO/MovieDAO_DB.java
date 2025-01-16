@@ -1,6 +1,6 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
-import dk.easv.mytunes.privatemoviecollection.BE.Genre;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 
 import java.io.IOException;
@@ -93,6 +93,25 @@ public class MovieDAO_DB implements IMovieDataAccess {
             }
         } catch (SQLException e) {
             throw new Exception("Unable to create the movie: " + movie.getTitle().trim() + ". Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void setLastPlayed(Movie movie) throws Exception {
+        String sql_update = "UPDATE Movie set lastView = ? WHERE MovieID = ?";
+
+        try (Connection conn = dbConnector.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement sql_update_connection = conn.prepareStatement(sql_update)) {
+                sql_update_connection.setString(1, movie.getLastView());
+                sql_update_connection.setInt(2, movie.getMovieID());
+                sql_update_connection.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println(e);
+                throw new Exception("Unable to delete the movie from CatMovie " + movie.getTitle().trim(), e);
+            }
         }
     }
 

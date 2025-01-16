@@ -82,4 +82,7 @@ public class Movie {
     }
 
 
+    public void setLastView(String time) {
+        this.lastView = time;
+    }
 }

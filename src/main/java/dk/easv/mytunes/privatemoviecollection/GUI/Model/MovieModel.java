@@ -7,7 +7,10 @@ import dk.easv.mytunes.privatemoviecollection.BLL.MovieManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MovieModel {
@@ -78,4 +81,8 @@ public class MovieModel {
         }
     }
 
+    public void setLastPlayed(Movie movie) throws Exception {
+        movie.setLastView(LocalDate.now().toString());
+        movieManager.setLastPlayed(movie);
+    }
 }

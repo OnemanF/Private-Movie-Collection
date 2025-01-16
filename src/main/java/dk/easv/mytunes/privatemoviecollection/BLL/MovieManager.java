@@ -53,4 +53,7 @@ public class MovieManager {
         movieDB.deleteMovie(movie);
     }
 
+    public void setLastPlayed(Movie movie) throws Exception {
+        movieDB.setLastPlayed(movie);
+    }
 }

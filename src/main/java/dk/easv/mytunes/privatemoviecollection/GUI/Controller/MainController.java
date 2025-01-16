@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 
@@ -65,9 +67,27 @@ public class MainController implements Initializable {
             SetupTableViews();
             addMovieButton.setOnAction(event -> showAddMovieDialog());
             movieTableView.setItems(movieModel.getMovies());
+
+            for (Movie movie : movieModel.getMovies()) {
+                LocalDate date = LocalDate.parse(movie.getLastView());
+                if (ChronoUnit.DAYS.between(date, LocalDate.now()) > (365 * 2)) {
+                    if (movie.getPersonalRating() <= 6) {
+                        warnUser(movie);
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void warnUser(Movie movie) {
+        System.out.println(movie.getTitle() + " 2 years since last view and personal rating <= 6");
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText(null);
+        alert.setContentText(movie.getTitle() + " 2 years since last view");
+        alert.showAndWait();
     }
 
     private void SetupTableViews(){
@@ -112,7 +132,7 @@ public class MainController implements Initializable {
                 if (selectedMovie != null) {
                     try {
                         playMovie(selectedMovie);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         System.err.println("Error playing movie: " + e.getMessage());
                     }
                 }
@@ -132,7 +152,7 @@ public class MainController implements Initializable {
         movieTableView.refresh();
     }
 
-    public void playMovie(Movie movie) throws IOException {
+    public void playMovie(Movie movie) throws Exception {
         if (movie == null) {
             System.err.println("Error: Attempted to play a null movie.");
             return;
@@ -146,6 +166,8 @@ public class MainController implements Initializable {
             alert.showAndWait();
             return;
         }
+
+        movieModel.setLastPlayed(movie);
         Desktop.getDesktop().open(file);
     }
 
