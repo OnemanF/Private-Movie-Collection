@@ -1,9 +1,6 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
-import dk.easv.mytunes.privatemoviecollection.BE.Movie;
-import dk.easv.mytunes.privatemoviecollection.BLL.CategoryManager;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -33,24 +30,6 @@ public class CategoryDAO_DB implements ICategoryDataAccess {
 
             return categories;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Category getCategoryById(int categoryId) {
-        String sql = "SELECT * FROM Category WHERE CategoryID = ?";
-        try (Connection conn = new DBConnector().getConnection()) {
-            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
-                ps_select.setInt(1, categoryId);
-                ResultSet rs = ps_select.executeQuery();
-                if (rs.next()) {
-                    return new Category(categoryId, rs.getString("CategoryName"), rs.getInt("movies"));
-                } else {
-                    return null;
-                }
-            }
-        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -111,8 +90,4 @@ public class CategoryDAO_DB implements ICategoryDataAccess {
             }
         }
     }
-
-
-
-
 }

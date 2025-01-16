@@ -1,16 +1,15 @@
 package dk.easv.mytunes.privatemoviecollection.GUI.Model;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Genre;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.BLL.GenreManager;
 import dk.easv.mytunes.privatemoviecollection.BLL.MovieManager;
+import dk.easv.mytunes.privatemoviecollection.DAO.CatMovieDAO_DB;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MovieModel {
@@ -18,13 +17,14 @@ public class MovieModel {
     private final MovieManager movieManager;
     private final ObservableList<Movie> allMovies = FXCollections.observableArrayList();
     private final GenreManager genreManager;
-
+    private final CatMovieDAO_DB catMovieDB;
 
     public MovieModel() throws Exception {
         this.movieManager = new MovieManager(this);
         this.moviesList = FXCollections.observableArrayList();
         allMovies.setAll(movieManager.getAllMovies());
         this.genreManager = new GenreManager();
+        this.catMovieDB = new CatMovieDAO_DB();
         refreshMoviesList();
     }
 
@@ -40,7 +40,7 @@ public class MovieModel {
     public ObservableList<Movie> getAllMovies() { return allMovies; }
 
     public List<Movie> searchMovies(String query, Category selectedCategory) throws Exception {
-        List<Movie> searchResult = movieManager.searchMovies(query); // Use instance method
+        List<Movie> searchResult = movieManager.searchMovies(query);
         moviesList.clear();
         moviesList.addAll(searchResult);
 
@@ -57,12 +57,12 @@ public class MovieModel {
         return moviesList;
     }
 
-    public Movie addMovie(Movie movie, List<Category> categories) throws Exception {
+    public Movie addMovie(Movie movie, List<Genre> genres, List<Category> categories) throws Exception {
         try {
-            Movie createdMovie = movieManager.addMovie(movie, categories);
-            System.out.println(createdMovie);
+            Movie createdMovie = movieManager.addMovie(movie, genres, categories);
             moviesList.add(createdMovie);
             allMovies.add(createdMovie);
+
             return createdMovie;
         } catch (Exception e) {
             String errorMessage = "Failed to add movie: " + movie.getTitle() + ". Error: " + e.getMessage();

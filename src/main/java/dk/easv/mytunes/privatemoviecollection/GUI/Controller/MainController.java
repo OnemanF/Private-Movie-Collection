@@ -1,9 +1,12 @@
 package dk.easv.mytunes.privatemoviecollection.GUI.Controller;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Genre;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
+import dk.easv.mytunes.privatemoviecollection.GUI.Model.GenreModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -55,9 +58,11 @@ public class MainController implements Initializable {
     private MovieModel movieModel;
     private ObservableList<String> categories;
     private Category selectedCategory = null;
+    private GenreModel genreModel;
 
     public MainController() throws IOException {
         categoryModel = new CategoryModel();
+        this.genreModel = new GenreModel();
     }
 
     @Override
@@ -68,14 +73,16 @@ public class MainController implements Initializable {
             addMovieButton.setOnAction(event -> showAddMovieDialog());
             movieTableView.setItems(movieModel.getMovies());
 
-            for (Movie movie : movieModel.getMovies()) {
-                LocalDate date = LocalDate.parse(movie.getLastView());
-                if (ChronoUnit.DAYS.between(date, LocalDate.now()) > (365 * 2)) {
-                    if (movie.getPersonalRating() <= 6) {
-                        warnUser(movie);
+            Platform.runLater(() -> {
+                for (Movie movie : movieModel.getMovies()) {
+                    LocalDate date = LocalDate.parse(movie.getLastView());
+                    if (ChronoUnit.DAYS.between(date, LocalDate.now()) > (365 * 2)) {
+                        if (movie.getPersonalRating() <= 6) {
+                            warnUser(movie);
+                        }
                     }
                 }
-            }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,12 +115,11 @@ public class MainController implements Initializable {
         categoryListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 try {
-                    CatMovieList.setAll(categoryModel.getMoviesByCategory(newValue.getCategoryID()));
-                    movieTableView.setItems(CatMovieList);
-                    selectedCategory = newValue;
-                    searchMovie(txtMovieSearch.getText());
+                    List<Movie> movies = categoryModel.getMoviesByCategory(newValue.getCategoryID());
+                    movieTableView.setItems(FXCollections.observableArrayList(movies)); // Update the table view with movies from the category
+                    selectedCategory = newValue; // Store the selected category
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    displayError("Failed to load movies for category: " + e.getMessage());
                 }
             }
         });
@@ -184,30 +190,45 @@ public class MainController implements Initializable {
         TextField personalRatingField = new TextField();
         personalRatingField.setPromptText("Personal Rating");
 
-        TextField genreField = new TextField();
-        genreField.setPromptText("Genre");
-
         ListView<Category> categoryListView = new ListView<>();
-        categoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        categoryListView.setPrefHeight(100);
         try {
             categoryListView.setItems(categoryModel.getCategories());
         } catch (Exception e) {
             displayError("Error loading categories: " + e.getMessage());
             return;
         }
+        categoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Dynamic Label for Selected Categories
-        Label selectedCategoriesLabel = new Label("Selected Categories: None");
+        ListView<Genre> genreListView = new ListView<>();
+        genreListView.setPrefHeight(100);
+        genreListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        try {
+            genreListView.setItems(genreModel.getGenres());
+        } catch (Exception e) {
+            displayError("Error loading genres: " + e.getMessage());
+            return;
+        }
 
-        ObservableList<Category> selectedItems = categoryListView.getSelectionModel().getSelectedItems();
-        selectedItems.addListener((ListChangeListener<Category>) change -> {
+        Label selectedGenresLabel = new Label("Selected Genres: None");
+        ObservableList<Genre> selectedGenres = genreListView.getSelectionModel().getSelectedItems();
+        selectedGenres.addListener((ListChangeListener<Genre>) change -> {
             StringBuilder selected = new StringBuilder();
-            for (Category category : selectedItems) {
+            for (Genre genre : selectedGenres) {
+                selected.append(genre.getGenreName()).append(", ");
+            }
+            selectedGenresLabel.setText("Selected Genres: " + (selected.length() > 0 ? selected.substring(0, selected.length() - 2) : "None"));
+        });
+
+        Label selectedCategoriesLabel = new Label("Selected Categories: None");
+        ObservableList<Category> selectedCategories = categoryListView.getSelectionModel().getSelectedItems();
+        selectedCategories.addListener((ListChangeListener<Category>) change -> {
+            StringBuilder selected = new StringBuilder();
+            for (Category category : selectedCategories) {
                 selected.append(category.getCategoryName()).append(", ");
             }
             selectedCategoriesLabel.setText("Selected Categories: " + (selected.length() > 0 ? selected.substring(0, selected.length() - 2) : "None"));
         });
-
 
         TextField fileField = new TextField();
         fileField.setEditable(false);
@@ -223,22 +244,23 @@ public class MainController implements Initializable {
         });
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(7);
+        grid.setVgap(7);
         grid.add(new Label("Title:"), 0, 0);
         grid.add(titleField, 1, 0);
         grid.add(new Label("IMDB Rating:"), 0, 1);
         grid.add(imdbRatingField, 1, 1);
         grid.add(new Label("Personal Rating:"), 0, 2);
         grid.add(personalRatingField, 1, 2);
-        grid.add(new Label("Genre:"), 0, 3);
-        grid.add(genreField, 1, 3);
-        grid.add(new Label("Categories:"), 0, 4);
-        grid.add(categoryListView, 1, 4);
-        grid.add(selectedCategoriesLabel, 1, 5);
-        grid.add(new Label("File:"), 0, 6);
-        grid.add(fileField, 1, 6);
-        grid.add(browseButton, 2, 6);
+        grid.add(new Label("Categories:"), 0, 3);
+        grid.add(categoryListView, 1, 3);
+        grid.add(selectedCategoriesLabel, 1, 4);
+        grid.add(new Label("Genres:"), 0, 5);
+        grid.add(genreListView, 1, 5);
+        grid.add(selectedGenresLabel, 1, 6);
+        grid.add(new Label("File:"), 0, 7);
+        grid.add(fileField, 1, 7);
+        grid.add(browseButton, 2, 7);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -247,29 +269,30 @@ public class MainController implements Initializable {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
-                return handleDialogResult(titleField, imdbRatingField, personalRatingField, genreField, categoryListView, fileField);
+                return handleDialogResult(titleField, imdbRatingField, personalRatingField, categoryListView, genreListView, fileField);
             }
             return null;
         });
 
         Optional<Movie> result = dialog.showAndWait();
-        result.ifPresent(movie -> handleMovieAddition(movie, categoryListView.getSelectionModel().getSelectedItems()));
+        result.ifPresent(movie -> handleMovieAddition(movie, selectedGenres, selectedCategories));
     }
 
-    private Movie handleDialogResult(TextField titleField, TextField imdbRatingField, TextField personalRatingField, TextField genreField, ListView<Category> categoryListView, TextField fileField) {
+    private Movie handleDialogResult(TextField titleField, TextField imdbRatingField, TextField personalRatingField, ListView<Category> categoryListView, ListView<Genre> genreListView, TextField fileField) {
         try {
             String title = titleField.getText().trim();
             int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
             int personalRating = Integer.parseInt(personalRatingField.getText().trim());
-            String genre = genreField.getText().trim();
             ObservableList<Category> selectedCategories = categoryListView.getSelectionModel().getSelectedItems();
-            String lastViewed = java.time.LocalDate.now().toString();
+            ObservableList<Genre> selectedGenres = genreListView.getSelectionModel().getSelectedItems();
+            String lastViewed = LocalDate.now().toString();
             String filePath = fileField.getText().trim();
 
-            validateInputs(title, imdbRating, personalRating, genre, selectedCategories, filePath);
+            validateInputs(title, imdbRating, personalRating, selectedCategories, selectedGenres, filePath);
 
-            return new Movie(title, genre, imdbRating, personalRating, lastViewed, filePath);
+            String primaryCategory = selectedCategories.isEmpty() ? "Uncategorized" : selectedCategories.get(0).getCategoryName();
 
+            return new Movie(title, primaryCategory, imdbRating, personalRating, lastViewed, filePath);
         } catch (NumberFormatException e) {
             displayError("IMDB and Personal Rating must be valid numbers.");
         } catch (IllegalArgumentException e) {
@@ -278,14 +301,21 @@ public class MainController implements Initializable {
         return null;
     }
 
-    private void handleMovieAddition(Movie movie, ObservableList<Category> categories) {
-        if (movie == null || categories == null || categories.isEmpty()) {
+    private void handleMovieAddition(Movie movie, ObservableList<Genre> genres, ObservableList<Category> categories) {
+        if (movie == null || genres == null || genres.isEmpty() || categories == null || categories.isEmpty()) {
+            displayError("Movie, genres, or categories are invalid.");
             return;
         }
 
         try {
-            movieModel.addMovie(movie, categories);
-            movieTableView.refresh();
+            movieModel.addMovie(movie, genres, categories);
+            movieTableView.setItems(movieModel.getMovies());
+
+            if (selectedCategory != null) {
+                CatMovieList.setAll(categoryModel.getMoviesByCategory(selectedCategory.getCategoryID()));
+                categoryListView.refresh();
+            }
+
             searchMovie(txtMovieSearch.getText());
             System.out.println("Movie added successfully: " + movie);
         } catch (Exception e) {
@@ -293,10 +323,10 @@ public class MainController implements Initializable {
         }
     }
 
-    private void validateInputs(String title, int imdbRating, int personalRating, String genre, ObservableList<Category> selectedCategories, String filePath) {
+    private void validateInputs(String title, int imdbRating, int personalRating, ObservableList<Category> selectedCategories, ObservableList<Genre> selectedGenres, String filePath) {
         if (title.isEmpty()) throw new IllegalArgumentException("Title cannot be empty.");
-        if (genre.isEmpty()) throw new IllegalArgumentException("Genre cannot be empty.");
         if (selectedCategories == null || selectedCategories.isEmpty()) throw new IllegalArgumentException("You must select at least one category.");
+        if (selectedGenres == null || selectedGenres.isEmpty()) throw new IllegalArgumentException("You must select at least one genre.");
         if (filePath.isEmpty()) throw new IllegalArgumentException("You must select a file.");
         if (imdbRating < 0 || imdbRating > 10) throw new IllegalArgumentException("IMDB Rating must be between 0 and 10.");
         if (personalRating < 0 || personalRating > 10) throw new IllegalArgumentException("Personal Rating must be between 0 and 10.");
@@ -309,8 +339,6 @@ public class MainController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
 
     @FXML
     private void RemoveMovie(ActionEvent actionEvent) {

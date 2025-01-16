@@ -1,8 +1,7 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Genre;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -41,32 +40,14 @@ public class MovieDAO_DB implements IMovieDataAccess {
         return movies;
     }
 
-    @Override
-    public Movie getMovieById(int ID) throws IOException {
-        String sql = "SELECT * FROM Movie WHERE MovieID = ?";
-        try (Connection conn = new DBConnector().getConnection()) {
-            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
-                ps_select.setInt(1, ID);
-                ResultSet rs = ps_select.executeQuery();
-                if (rs.next()) {
-                    return new Movie(ID, rs.getString("title"), rs.getInt("IMBDRating"), rs.getInt("personalRating"), rs.getString("lastView"), rs.getString("genre"), rs.getString("filePath"));
-                } else {
-                    return null;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     @Override
-    public Movie createMovie(Movie movie, List<Category> categories) throws Exception {
+    public Movie createMovie(Movie movie, List<Genre> genres) throws Exception {
         String sql_insert = "INSERT INTO Movie (title, IMBDRating, personalRating, lastview, genre, filePath) VALUES (?, ?, ?, ?, ?, ?)";
 
         List<String> genreNames = new ArrayList<>();
-        for (Category category : categories) {
-            genreNames.add(category.getCategoryName());
+        for (Genre genre : genres) {
+            genreNames.add(genre.getGenreName());
         }
         movie.setGenre(String.join(",", genreNames));
 
@@ -117,32 +98,64 @@ public class MovieDAO_DB implements IMovieDataAccess {
 
     @Override
     public void deleteMovie(Movie movie) throws Exception {
-        String delete_categoriesSQL = "DELETE FROM Movie WHERE MovieID = ?";
-        String delete_connectionSQL = "DELETE FROM CatMovie WHERE MovieID = ?";
+        String delete_movie_genre_SQL = "DELETE FROM MovieGenre WHERE MovieID = ?";
+        String delete_movie_sql = "DELETE FROM Movie WHERE MovieID = ?";
+        String delete_cat_movie_sql = "DELETE FROM CatMovie WHERE MovieID = ?";
 
         try (Connection conn = dbConnector.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement ps_delete_connection = conn.prepareStatement(delete_connectionSQL)) {
-                ps_delete_connection.setInt(1, movie.getMovieID());
-                ps_delete_connection.executeUpdate();
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                System.out.println(e);
-                throw new Exception("Unable to delete the movie from CatMovie " + movie.getTitle().trim(), e);
+
+            try (PreparedStatement ps_delete_movie_genre = conn.prepareStatement(delete_movie_genre_SQL)) {
+                ps_delete_movie_genre.setInt(1, movie.getMovieID());
+                ps_delete_movie_genre.executeUpdate();
             }
 
-
-            try (PreparedStatement ps_delete_category = conn.prepareStatement(delete_categoriesSQL)) {
-                ps_delete_category.setInt(1, movie.getMovieID());
-                ps_delete_category.executeUpdate();
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                System.out.println(e);
-                throw new Exception("Unable to delete the movie from Movie " + movie.getTitle().trim(), e);
+            try (PreparedStatement ps_delete_cat_movie = conn.prepareStatement(delete_cat_movie_sql)) {
+                ps_delete_cat_movie.setInt(1, movie.getMovieID());
+                ps_delete_cat_movie.executeUpdate();
             }
+
+            try (PreparedStatement ps_delete_movie = conn.prepareStatement(delete_movie_sql)) {
+                ps_delete_movie.setInt(1, movie.getMovieID());
+                ps_delete_movie.executeUpdate();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            try (Connection conn = dbConnector.getConnection()) {
+                conn.rollback();
+            }
+            throw new Exception("Failed to delete movie " + movie.getTitle() + " due to: " + e.getMessage(), e);
         }
     }
 
+    @Override
+    public void addMovieToGenre(Movie movie, Genre genre) throws SQLException {
+        String sql = "INSERT INTO MovieGenre (movieID, genreID) VALUES (?, ?)";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, movie.getMovieID());
+            ps.setInt(2, genre.getGenreID());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Error adding movie to genre: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void addMovieToCategory(Movie movie, Category category) throws Exception {
+        String sql = "INSERT INTO CatMovie (MovieID, CategoryID) VALUES (?, ?)";
+
+        try (Connection connection = DBConnector.getConnection();  // Get the connection from DBConnector
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, movie.getMovieID());  // MovieID from the Movie object
+            statement.setInt(2, category.getCategoryID());  // CategoryID from the Category object
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new Exception("Error adding movie to category: " + e.getMessage(), e);
+        }
+    }
 }

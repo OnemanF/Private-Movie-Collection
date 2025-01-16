@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ICategoryDataAccess {
+
     Category createCategory(Category category) throws Exception;
+
     void deleteCategory(Category category) throws Exception;
 
     List<Category> getCategories() throws IOException;
-
-    Category getCategoryById(int categoryId);
 }

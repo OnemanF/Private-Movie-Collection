@@ -41,44 +41,34 @@ public class CatMovieDAO_DB implements ICatMovieDataAccess {
         }
     }
 
-    @Override
-    public List<String> getCategoriesByMovie(int movieId) throws IOException, SQLException {
-        List<String> categories = new ArrayList<>();
-        String sql = "SELECT * FROM CatMovie WHERE MovieID = ?";
-        try (Connection conn = new DBConnector().getConnection()) {
-            try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
-                ps_select.setInt(1, movieId);
-                ResultSet rs = ps_select.executeQuery();
-                while (rs.next())
-                {
-                    Category categori = categoryDAO.getCategoryById(rs.getInt("CategoryID"));
-                    if (categori != null) {
-                        categories.add(categori.getCategoryName());
-                    }
-                }
-            }
-
-            return categories;
-        }
-    }
 
     @Override
     public List<Movie> getMoviesByCategory(int categoryId) throws IOException, SQLException {
         List<Movie> movies = new ArrayList<>();
+        String sql = "SELECT m.MovieID, m.title, m.genre, m.IMBDRating, m.personalRating, m.lastView, m.filePath " +
+                "FROM Movie m " +
+                "JOIN CatMovie cm ON m.MovieID = cm.MovieID " +
+                "WHERE cm.CategoryID = ?";
 
-        String sql = "SELECT * FROM CatMovie WHERE CategoryID = ?";
         try (Connection conn = new DBConnector().getConnection()) {
             try (PreparedStatement ps_select = conn.prepareStatement(sql)) {
                 ps_select.setInt(1, categoryId);
                 ResultSet rs = ps_select.executeQuery();
-                while (rs.next())
-                {
-                    Movie movie = movieDAO.getMovieById(rs.getInt("MovieID"));
+                while (rs.next()) {
+                    int id = rs.getInt("MovieID");
+                    String title = rs.getString("title");
+                    int imdbRating = rs.getInt("IMBDRating");
+                    int personalRating = rs.getInt("personalRating");
+                    String lastView = rs.getString("lastView");
+                    String genre = rs.getString("genre");
+                    String filePath = rs.getString("filePath");
+
+                    Movie movie = new Movie(id, title, imdbRating, personalRating, lastView, genre, filePath);
                     movies.add(movie);
                 }
             }
-
-            return movies;
         }
+        return movies;
     }
+
 }
