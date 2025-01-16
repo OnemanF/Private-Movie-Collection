@@ -50,8 +50,8 @@
                 <!-- Buttons -->
                 <Button fx:id="addMovieButton" layoutX="20.0" layoutY="430.0" mnemonicParsing="false" onAction="#AddMovie" style="-fx-background-color: #5f5f5f;" text="Add Movie" textFill="WHITE" />
                 <Button fx:id="btnRemoveMovie" layoutX="120.0" layoutY="430.0" mnemonicParsing="false" onAction="#RemoveMovie" style="-fx-background-color: #5f5f5f;" text="Remove Movie" textFill="WHITE" />
-                <Button fx:id="btnAddCategory" layoutX="550.0" layoutY="340.0" mnemonicParsing="false" style="-fx-background-color: #5f5f5f;" text="Add Category" textFill="WHITE" />
-                <Button fx:id="btnRemoveCategory" layoutX="650.0" layoutY="340.0" mnemonicParsing="false" style="-fx-background-color: #5f5f5f;" text="Remove Category" textFill="WHITE" />
+                <Button fx:id="btnAddCategory" layoutX="550.0" layoutY="340.0" mnemonicParsing="false" onAction="#AddCategory" style="-fx-background-color: #5f5f5f;" text="Add Category" textFill="WHITE" />
+                <Button fx:id="btnRemoveCategory" layoutX="650.0" layoutY="340.0" mnemonicParsing="false" onAction="#RemoveCategory" style="-fx-background-color: #5f5f5f;" text="Remove Category" textFill="WHITE" />
             </children>
         </AnchorPane>
     </children>
