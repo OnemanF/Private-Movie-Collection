@@ -5,6 +5,7 @@ import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.CategoryModel;
 import dk.easv.mytunes.privatemoviecollection.GUI.Model.MovieModel;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -164,14 +165,27 @@ public class MainController implements Initializable {
         TextField genreField = new TextField();
         genreField.setPromptText("Genre");
 
-        ComboBox<Category> categoryDropdown = new ComboBox<>();
+        ListView<Category> categoryListView = new ListView<>();
+        categoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         try {
-            categoryDropdown.setItems(categoryModel.getCategories());
-            categoryDropdown.setPromptText("Select Category");
+            categoryListView.setItems(categoryModel.getCategories());
         } catch (Exception e) {
-            System.out.println("Error loading categories: " + e.getMessage());
+            displayError("Error loading categories: " + e.getMessage());
             return;
         }
+
+        // Dynamic Label for Selected Categories
+        Label selectedCategoriesLabel = new Label("Selected Categories: None");
+
+        ObservableList<Category> selectedItems = categoryListView.getSelectionModel().getSelectedItems();
+        selectedItems.addListener((ListChangeListener<Category>) change -> {
+            StringBuilder selected = new StringBuilder();
+            for (Category category : selectedItems) {
+                selected.append(category.getCategoryName()).append(", ");
+            }
+            selectedCategoriesLabel.setText("Selected Categories: " + (selected.length() > 0 ? selected.substring(0, selected.length() - 2) : "None"));
+        });
+
 
         TextField fileField = new TextField();
         fileField.setEditable(false);
@@ -186,7 +200,6 @@ public class MainController implements Initializable {
             }
         });
 
-
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -196,11 +209,14 @@ public class MainController implements Initializable {
         grid.add(imdbRatingField, 1, 1);
         grid.add(new Label("Personal Rating:"), 0, 2);
         grid.add(personalRatingField, 1, 2);
-        grid.add(new Label("Category:"), 0, 3);
-        grid.add(categoryDropdown, 1, 3);
-        grid.add(new Label("File:"), 0, 4);
-        grid.add(fileField, 1, 4);
-        grid.add(browseButton, 2, 4);
+        grid.add(new Label("Genre:"), 0, 3);
+        grid.add(genreField, 1, 3);
+        grid.add(new Label("Categories:"), 0, 4);
+        grid.add(categoryListView, 1, 4);
+        grid.add(selectedCategoriesLabel, 1, 5);
+        grid.add(new Label("File:"), 0, 6);
+        grid.add(fileField, 1, 6);
+        grid.add(browseButton, 2, 6);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -209,65 +225,56 @@ public class MainController implements Initializable {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
-                Movie movie = handleDialogResult(titleField, imdbRatingField, personalRatingField, genreField, categoryDropdown, fileField);
-                if (movie == null) {
-                    return null;
-                }
-                return movie;
+                return handleDialogResult(titleField, imdbRatingField, personalRatingField, genreField, categoryListView, fileField);
             }
             return null;
         });
 
         Optional<Movie> result = dialog.showAndWait();
-        result.ifPresent(movie -> handleMovieAddition(movie, categoryDropdown.getValue()));
+        result.ifPresent(movie -> handleMovieAddition(movie, categoryListView.getSelectionModel().getSelectedItems()));
     }
 
-    private Movie handleDialogResult(TextField titleField, TextField imdbRatingField, TextField personalRatingField, TextField genreField, ComboBox<Category> categoryDropdown, TextField fileField) {
+    private Movie handleDialogResult(TextField titleField, TextField imdbRatingField, TextField personalRatingField, TextField genreField, ListView<Category> categoryListView, TextField fileField) {
         try {
             String title = titleField.getText().trim();
             int imdbRating = Integer.parseInt(imdbRatingField.getText().trim());
             int personalRating = Integer.parseInt(personalRatingField.getText().trim());
             String genre = genreField.getText().trim();
-            Category selectedCategory = categoryDropdown.getValue();
+            ObservableList<Category> selectedCategories = categoryListView.getSelectionModel().getSelectedItems();
             String lastViewed = java.time.LocalDate.now().toString();
             String filePath = fileField.getText().trim();
 
-            validateInputs(title, imdbRating, personalRating, genre, selectedCategory, filePath);
+            validateInputs(title, imdbRating, personalRating, genre, selectedCategories, filePath);
 
-            Movie movie = new Movie(title, genre, imdbRating, personalRating, lastViewed, filePath);
-            return movie;
+            return new Movie(title, genre, imdbRating, personalRating, lastViewed, filePath);
 
         } catch (NumberFormatException e) {
             displayError("IMDB and Personal Rating must be valid numbers.");
         } catch (IllegalArgumentException e) {
             displayError("Validation Error: " + e.getMessage());
-        } catch (Exception e) {
-            displayError("Unexpected Error: " + e.getMessage());
         }
         return null;
     }
 
-
-    private void handleMovieAddition(Movie movie, Category category) {
-        if (movie == null) {
+    private void handleMovieAddition(Movie movie, ObservableList<Category> categories) {
+        if (movie == null || categories == null || categories.isEmpty()) {
             return;
         }
 
         try {
-            movieModel.addMovie(movie, Collections.singletonList(category));
+            movieModel.addMovie(movie, categories);
             movieTableView.refresh();
-            System.out.println("Movie added successfully: " + movie);
             searchMovie(txtMovieSearch.getText());
+            System.out.println("Movie added successfully: " + movie);
         } catch (Exception e) {
-            String errorMessage = "Failed to add movie: " + e.getMessage();
-            displayError(errorMessage);
+            displayError("Failed to add movie: " + e.getMessage());
         }
     }
 
-    private void validateInputs(String title, int imdbRating, int personalRating, String genre, Category selectedCategory, String filePath) {
+    private void validateInputs(String title, int imdbRating, int personalRating, String genre, ObservableList<Category> selectedCategories, String filePath) {
         if (title.isEmpty()) throw new IllegalArgumentException("Title cannot be empty.");
         if (genre.isEmpty()) throw new IllegalArgumentException("Genre cannot be empty.");
-        if (selectedCategory == null) throw new IllegalArgumentException("You must select a category.");
+        if (selectedCategories == null || selectedCategories.isEmpty()) throw new IllegalArgumentException("You must select at least one category.");
         if (filePath.isEmpty()) throw new IllegalArgumentException("You must select a file.");
         if (imdbRating < 0 || imdbRating > 10) throw new IllegalArgumentException("IMDB Rating must be between 0 and 10.");
         if (personalRating < 0 || personalRating > 10) throw new IllegalArgumentException("Personal Rating must be between 0 and 10.");

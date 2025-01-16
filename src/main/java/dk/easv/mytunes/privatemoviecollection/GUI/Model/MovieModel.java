@@ -2,6 +2,7 @@ package dk.easv.mytunes.privatemoviecollection.GUI.Model;
 
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
+import dk.easv.mytunes.privatemoviecollection.BLL.GenreManager;
 import dk.easv.mytunes.privatemoviecollection.BLL.MovieManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,14 +14,17 @@ public class MovieModel {
     private final ObservableList<Movie> moviesList;
     private final MovieManager movieManager;
     private final ObservableList<Movie> allMovies = FXCollections.observableArrayList();
+    private final GenreManager genreManager;
 
 
     public MovieModel() throws Exception {
         this.movieManager = new MovieManager(this);
         this.moviesList = FXCollections.observableArrayList();
         allMovies.setAll(movieManager.getAllMovies());
+        this.genreManager = new GenreManager();
         refreshMoviesList();
     }
+
 
     private void refreshMoviesList() throws Exception {
         moviesList.clear();

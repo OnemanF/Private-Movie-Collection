@@ -1,5 +1,6 @@
 package dk.easv.mytunes.privatemoviecollection.DAO;
 import dk.easv.mytunes.privatemoviecollection.BE.Category;
+import dk.easv.mytunes.privatemoviecollection.BE.Genre;
 import dk.easv.mytunes.privatemoviecollection.BE.Movie;
 
 import java.io.IOException;
